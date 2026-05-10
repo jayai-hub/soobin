@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 閃耀秀彬教練 V14 (Cloud & Link)</title>
+    <title>✨ 閃耀秀彬教練 V15 (Perfect Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -18,6 +18,13 @@
         .fit-img { width: 100%; height: 200px; object-fit: contain; background-color: #000; border-radius: 1.5rem; margin-bottom: 1rem; }
         .soobin-bubble { background: #fff; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; color: #db2777; font-weight: bold; text-align: center; }
         .hidden { display: none; }
+        /* V12 스위치 스타일 복구 */
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #ff75c3; }
+        input:checked + .slider:before { transform: translateX(26px); }
     </style>
 </head>
 <body onload="loadFromCloud()">
@@ -78,16 +85,20 @@
 
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 雲端智慧後台</h2>
+                <h2 class="text-xl font-bold text-gray-800">🐰 秀彬智慧後台 (V15)</h2>
                 <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
             </div>
 
             <div class="space-y-6">
-                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                    <p class="text-xs font-bold text-blue-600 mb-2">🖼️ 圖片網址設定 (請貼上圖片連結)</p>
-                    <div class="space-y-2">
-                        <input type="text" id="admin-main-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上首頁圖片網址 (http...)">
+                <div class="flex justify-between items-center bg-gray-100 p-4 rounded-xl">
+                    <div>
+                        <p class="font-bold text-sm text-gray-700">啟用圖片功能 (On/Off)</p>
+                        <p class="text-xs text-gray-500">顯示或隱藏科目首頁圖</p>
                     </div>
+                    <label class="switch">
+                        <input type="checkbox" id="img-toggle" onchange="toggleImgSection()">
+                        <span class="slider"></span>
+                    </label>
                 </div>
 
                 <div>
@@ -103,13 +114,18 @@
                 </div>
 
                 <div id="admin-main-area" class="hidden space-y-6">
+                    <div id="img-upload-section" class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <p class="text-xs font-bold text-blue-600 mb-2">🖼️ 圖片網址設定 (Link)</p>
+                        <input type="text" id="admin-main-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上圖片連結 (http...)">
+                    </div>
+
                     <div>
                         <p class="text-sm font-bold text-pink-600 mb-2">2. 單元管理</p>
                         <div id="admin-unit-list" class="space-y-2 mb-4"></div>
                         <button onclick="addUnitRow()" class="w-full py-2 border-2 border-dashed border-pink-200 text-pink-400 text-sm font-bold rounded-lg">+ 新增單元</button>
                     </div>
 
-                    <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4 shadow-inner">
+                    <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4">
                         <h3 class="font-bold text-gray-700">編輯中: <span id="editing-unit-name" class="text-pink-500"></span></h3>
                         <textarea id="admin-summary" class="w-full h-40 p-3 text-xs border rounded bg-gray-50" placeholder="貼上重點整理..."></textarea>
                         <textarea id="admin-questions" class="w-full h-40 p-3 text-xs border rounded font-mono bg-gray-50" placeholder="貼上 JSON 題目..."></textarea>
@@ -123,12 +139,11 @@
     </main>
 
     <script>
-        // 클라우드 설정
         const BIN_ID = "6a005e56adc21f119a7c1f86";
         const MASTER_KEY = "$2a$10$0IMIZdF3/BKscfzxvO6MuepHI4f3d2VXiIus8mfSCo1FIPXoZVFQ.";
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-        let db = { settings: { imgEnabled: true } };
+        let db = { units: [], settings: { imgEnabled: true } };
         let curSub = '', curUnitIdx = -1, testList = [], curIdx = 0;
 
         async function loadFromCloud() {
@@ -136,32 +151,36 @@
                 const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
                 db = data.record;
+                if(!db.settings) db.settings = { imgEnabled: true };
+                document.getElementById('img-toggle').checked = db.settings.imgEnabled;
                 document.getElementById('loading-overlay').classList.add('hidden');
-            } catch (e) { alert("雲端同步失敗！"); }
+            } catch (e) { alert("同步失敗！"); }
         }
 
         async function saveToCloud() {
             const btn = document.getElementById('final-save-btn');
-            btn.innerText = "⏳ 正在同步至雲端...";
+            btn.innerText = "⏳ 正在同步...";
             try {
-                // 저장 전 이미지 URL 업데이트
+                db.settings.imgEnabled = document.getElementById('img-toggle').checked;
                 if(curSub) db[curSub].mainImg = document.getElementById('admin-main-img-url').value;
                 
-                const res = await fetch(API_URL, {
+                await fetch(API_URL, {
                     method: 'PUT',
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(db)
                 });
-                if(res.ok) {
-                    alert("✅ 儲存並同步成功！");
-                    toggleAdmin();
-                    if(curSub) showHome();
-                }
-            } catch (e) { alert("❌ 儲存失敗！"); }
+                alert("✅ 儲存成功！");
+                toggleAdmin();
+                if(curSub) showHome();
+            } catch (e) { alert("❌ 儲存失敗"); }
             finally { btn.innerText = "💾 儲存並同步至雲端"; }
         }
 
         function toggleAdmin() { document.getElementById('page-admin').classList.toggle('hidden'); }
+        function toggleImgSection() { 
+            const isEnabled = document.getElementById('img-toggle').checked;
+            document.getElementById('img-upload-section').classList.toggle('hidden', !isEnabled);
+        }
 
         function adminSelectSub(sub) {
             curSub = sub;
@@ -173,6 +192,7 @@
             document.getElementById('admin-main-img-url').value = db[curSub].mainImg || '';
             document.getElementById('admin-main-area').classList.remove('hidden');
             document.getElementById('edit-area').classList.add('hidden');
+            toggleImgSection();
             renderAdminUnits();
         }
 
@@ -207,7 +227,7 @@
             try {
                 db[curSub].units[curUnitIdx].summary = document.getElementById('admin-summary').value;
                 db[curSub].units[curUnitIdx].questions = JSON.parse(document.getElementById('admin-questions').value);
-                alert("暫存成功！記得最後要點擊同步按鈕。");
+                alert("暫存成功！別忘了最後要同步雲端。");
                 document.getElementById('edit-area').classList.add('hidden');
             } catch(e) { alert("❌ JSON 格式錯誤！"); }
         }
@@ -220,7 +240,8 @@
         function showHome() {
             document.getElementById('welcome-msg').innerText = curSub;
             const imgCont = document.getElementById('main-img-container');
-            imgCont.innerHTML = db[curSub].mainImg ? `<img src="${db[curSub].mainImg}" class="fit-img shadow-lg">` : '';
+            const isImgOn = document.getElementById('img-toggle').checked;
+            imgCont.innerHTML = (isImgOn && db[curSub].mainImg) ? `<img src="${db[curSub].mainImg}" class="fit-img shadow-lg">` : '';
             
             const listCont = document.getElementById('unit-list-container');
             listCont.innerHTML = '';
