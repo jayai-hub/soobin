@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 閃耀秀彬教練 V17 (Recovery)</title>
+    <title>✨ 閃耀秀彬教練 V18 (Clean Image)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -15,7 +15,7 @@
         .subject-btn:hover { background-color: #fce7f3; transform: translateY(-2px); }
         .summary-box { white-space: pre-wrap; line-height: 1.8; font-size: 1.05rem; }
         .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 4px; font-weight: bold; color: #92400e; }
-        .fit-img { width: 100%; height: 200px; object-fit: contain; background-color: #000; border-radius: 1.5rem; margin-bottom: 1rem; }
+        .fit-img { width: 100%; height: auto; max-height: 300px; object-fit: contain; background-color: #fff; border-radius: 1.5rem; margin-bottom: 1rem; }
         .soobin-bubble { background: #fff; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; color: #db2777; font-weight: bold; text-align: center; }
         .hidden { display: none; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
@@ -88,25 +88,19 @@
 
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V17)</h2>
+                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V18)</h2>
                 <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
             </div>
 
             <div class="space-y-6">
                 <div class="flex justify-between items-center bg-gray-100 p-4 rounded-xl">
-                    <div>
-                        <p class="font-bold text-sm text-gray-700">啟用圖片功能</p>
-                        <p class="text-xs text-gray-500">控制全站圖片顯示</p>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" id="img-toggle" onchange="toggleImgSection()" checked>
-                        <span class="slider"></span>
-                    </label>
+                    <div><p class="font-bold text-sm text-gray-700">啟用圖片功能</p></div>
+                    <label class="switch"><input type="checkbox" id="img-toggle" onchange="toggleImgSection()" checked><span class="slider"></span></label>
                 </div>
 
-                <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
-                    <p class="text-xs font-bold text-purple-600 mb-2">🏠 앱 전체 대문 사진 (App Main Link)</p>
-                    <input type="text" id="admin-app-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上 App 第一頁的圖片網址">
+                <div class="bg-purple-50 p-4 rounded-xl">
+                    <p class="text-xs font-bold text-purple-600 mb-2">🏠 App 第一頁照片 (Main Image)</p>
+                    <input type="text" id="admin-app-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上網址">
                 </div>
 
                 <div>
@@ -122,37 +116,27 @@
                 </div>
 
                 <div id="admin-main-area" class="hidden space-y-6">
-                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <div class="bg-blue-50 p-4 rounded-xl">
                         <p id="admin-sub-img-label" class="text-xs font-bold text-blue-600 mb-2"></p>
-                        <input type="text" id="admin-sub-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上該科目的代表網址">
+                        <input type="text" id="admin-sub-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上網址">
                     </div>
-
-                    <div>
-                        <p class="text-sm font-bold text-pink-600 mb-2">2. 單元管理</p>
-                        <div id="admin-unit-list" class="space-y-2 mb-4"></div>
-                        <button onclick="addUnitRow()" class="w-full py-2 border-2 border-dashed border-pink-200 text-pink-400 text-sm font-bold rounded-lg">+ 新增單元</button>
-                    </div>
-
+                    <div id="admin-unit-list" class="space-y-2"></div>
+                    <button onclick="addUnitRow()" class="w-full py-2 border-2 border-dashed border-pink-200 text-pink-400 text-sm font-bold rounded-lg">+ 新增單元</button>
+                    
                     <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4">
                         <h3 class="font-bold text-gray-700">編輯: <span id="editing-unit-name" class="text-pink-500"></span></h3>
                         <div class="p-3 bg-pink-50 rounded-lg">
-                            <p class="text-[10px] font-bold text-pink-400 mb-1">🖼️ 단원별 요점/테스트 사진 (Unit Image)</p>
-                            <input type="text" id="admin-unit-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上圖片網址">
+                            <p class="text-[10px] font-bold text-pink-400 mb-1">🖼️ 單元教學圖片 (Unit Image)</p>
+                            <input type="text" id="admin-unit-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上網址">
                         </div>
-                        <textarea id="admin-summary" class="w-full h-40 p-3 text-xs border rounded" placeholder="貼上重點整理..."></textarea>
-                        <textarea id="admin-questions" class="w-full h-40 p-3 text-xs border rounded font-mono" placeholder="貼上 JSON 題目..."></textarea>
+                        <textarea id="admin-summary" class="w-full h-40 p-3 text-xs border rounded" placeholder="重點整理..."></textarea>
+                        <textarea id="admin-questions" class="w-full h-40 p-3 text-xs border rounded" placeholder="JSON 題目..."></textarea>
                         <button onclick="applyUnitEdit()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl">確認暫存修改</button>
                     </div>
                 </div>
 
                 <button id="final-save-btn" onclick="saveToCloud()" class="w-full py-5 bg-gray-800 text-white font-bold rounded-2xl shadow-xl text-lg mt-10">💾 儲存並同步至雲端</button>
-                
-                <hr class="my-10">
-                <div class="bg-red-50 p-4 rounded-xl border border-red-100">
-                    <p class="text-xs font-bold text-red-600 mb-2">⚠️ 緊急修復 (Emergency)</p>
-                    <button onclick="resetData()" class="w-full py-2 bg-red-500 text-white text-xs font-bold rounded">初始化雲端數據 (慎用！)</button>
-                    <p class="text-[10px] text-red-400 mt-2">*只有在加載一直卡住、且無法修復時才使用。數據會清空。</p>
-                </div>
+                <div class="bg-red-50 p-4 rounded-xl mt-10"><button onclick="resetData()" class="w-full py-2 bg-red-500 text-white text-xs font-bold rounded">數據初始化 (慎用)</button></div>
             </div>
         </section>
     </main>
@@ -161,156 +145,79 @@
         const BIN_ID = "6a005e56adc21f119a7c1f86";
         const MASTER_KEY = "$2a$10$0IMIZdF3/BKscfzxvO6MuepHI4f3d2VXiIus8mfSCo1FIPXoZVFQ.";
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-
         let db = { settings: { imgEnabled: true }, appMainImg: '' };
         let curSub = '', curUnitIdx = -1, testList = [], curIdx = 0;
 
         async function loadFromCloud() {
             try {
                 const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY } });
-                if (!res.ok) throw new Error("Load Fail");
                 const data = await res.json();
                 db = data.record || db;
-                if(!db.settings) db.settings = { imgEnabled: true };
-                document.getElementById('img-toggle').checked = db.settings.imgEnabled;
+                document.getElementById('img-toggle').checked = db.settings?.imgEnabled ?? true;
                 document.getElementById('admin-app-img-url').value = db.appMainImg || '';
-                forceCloseLoading();
-                renderAppImg();
-            } catch (e) { 
-                console.log("Error loading cloud, using default.", e);
-                forceCloseLoading(); 
-            }
+                forceCloseLoading(); renderAppImg();
+            } catch (e) { forceCloseLoading(); }
         }
 
         async function saveToCloud() {
             const btn = document.getElementById('final-save-btn');
-            btn.innerText = "⏳ 正在同步...";
+            btn.innerText = "⏳ 同步中...";
             try {
                 db.settings.imgEnabled = document.getElementById('img-toggle').checked;
-                db.appMainImg = document.getElementById('admin-app-img-url').value;
-                if(curSub) db[curSub].mainImg = document.getElementById('admin-sub-img-url').value;
-                
-                const res = await fetch(API_URL, {
+                db.appMainImg = document.getElementById('admin-app-img-url').value.trim();
+                if(curSub) db[curSub].mainImg = document.getElementById('admin-sub-img-url').value.trim();
+                await fetch(API_URL, {
                     method: 'PUT',
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(db)
                 });
-                if(!res.ok) throw new Error("Save Fail");
-                alert("✅ 儲存成功！");
-                toggleAdmin();
-                renderAppImg();
-                if(curSub) showHome();
-            } catch (e) { alert("❌ 儲存失敗，請檢查網路！"); }
+                alert("✅ 儲存成功！"); toggleAdmin(); renderAppImg(); if(curSub) showHome();
+            } catch (e) { alert("❌ 儲存失敗"); }
             finally { btn.innerText = "💾 儲存並同步至雲端"; }
         }
 
-        async function resetData() {
-            if(confirm("確定要初始化嗎？現有的所有題目和設定將被清空！")) {
-                db = { settings: { imgEnabled: true }, appMainImg: '' };
-                await saveToCloud();
-                location.reload();
-            }
+        function createImgTag(url) {
+            if(!url || url.trim() === "") return "";
+            const cleanUrl = url.trim().replace(/['">]/g, ""); // 위험한 문자 제거
+            return `<img src="${cleanUrl}" class="fit-img shadow-lg" onerror="this.style.display='none'">`;
         }
 
-        function forceCloseLoading() { document.getElementById('loading-overlay').classList.add('hidden'); }
-        function toggleAdmin() { document.getElementById('page-admin').classList.toggle('hidden'); }
         function renderAppImg() {
-            const container = document.getElementById('app-img-container');
             const isImgOn = document.getElementById('img-toggle').checked;
-            container.innerHTML = (isImgOn && db.appMainImg) ? `<img src="${db.appMainImg}" class="fit-img shadow-lg">` : '';
-        }
-
-        function adminSelectSub(sub) {
-            curSub = sub;
-            if(!db[sub]) db[sub] = { units: [], mainImg: '', wrongs: [] };
-            document.querySelectorAll('.admin-sub-btn').forEach(btn => {
-                btn.style.backgroundColor = btn.innerText === sub ? '#ec4899' : 'white';
-                btn.style.color = btn.innerText === sub ? 'white' : 'black';
-            });
-            document.getElementById('admin-sub-img-label').innerText = `🖼️ ${sub} 代表照片`;
-            document.getElementById('admin-sub-img-url').value = db[curSub].mainImg || '';
-            document.getElementById('admin-main-area').classList.remove('hidden');
-            document.getElementById('edit-area').classList.add('hidden');
-            renderAdminUnits();
-        }
-
-        function renderAdminUnits() {
-            const cont = document.getElementById('admin-unit-list'); cont.innerHTML = '';
-            db[curSub].units.forEach((u, i) => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-white border rounded-xl shadow-sm";
-                div.innerHTML = `<span class="font-bold text-sm">${u.name}</span>
-                    <div class="space-x-2 text-xs">
-                        <button onclick="openEdit(${i})" class="text-blue-500 font-bold">編輯</button>
-                        <button onclick="deleteUnit(${i})" class="text-red-400">刪除</button>
-                    </div>`;
-                cont.appendChild(div);
-            });
-        }
-
-        function addUnitRow() {
-            const n = prompt("請輸入單元名稱:");
-            if(n) { db[curSub].units.push({name: n, summary: '', questions: [], unitImg: ''}); renderAdminUnits(); }
-        }
-
-        function openEdit(i) {
-            curUnitIdx = i; const u = db[curSub].units[i];
-            document.getElementById('editing-unit-name').innerText = u.name;
-            document.getElementById('admin-unit-img-url').value = u.unitImg || '';
-            document.getElementById('admin-summary').value = u.summary;
-            document.getElementById('admin-questions').value = JSON.stringify(u.questions, null, 2);
-            document.getElementById('edit-area').classList.remove('hidden');
-        }
-
-        function applyUnitEdit() {
-            try {
-                db[curSub].units[curUnitIdx].unitImg = document.getElementById('admin-unit-img-url').value;
-                db[curSub].units[curUnitIdx].summary = document.getElementById('admin-summary').value;
-                db[curSub].units[curUnitIdx].questions = JSON.parse(document.getElementById('admin-questions').value);
-                alert("暫存成功！");
-                document.getElementById('edit-area').classList.add('hidden');
-            } catch(e) { alert("❌ JSON 格式錯誤！請檢查題目括號。"); }
-        }
-
-        function selectSubject(sub) {
-            curSub = sub; if(!db[sub]) db[sub] = { units: [], mainImg: '', wrongs: [] };
-            showHome();
+            document.getElementById('app-img-container').innerHTML = isImgOn ? createImgTag(db.appMainImg) : '';
         }
 
         function showHome() {
             document.getElementById('welcome-msg').innerText = curSub;
-            const imgCont = document.getElementById('sub-img-container');
             const isImgOn = document.getElementById('img-toggle').checked;
-            imgCont.innerHTML = (isImgOn && db[curSub].mainImg) ? `<img src="${db[curSub].mainImg}" class="fit-img shadow-lg">` : '';
-            
+            document.getElementById('sub-img-container').innerHTML = isImgOn ? createImgTag(db[curSub].mainImg) : '';
             const listCont = document.getElementById('unit-list-container');
             listCont.innerHTML = '';
-            db[curSub].units.forEach((u, i) => {
+            (db[curSub].units || []).forEach((u, i) => {
                 const btn = document.createElement('button');
                 btn.className = "glass w-full p-5 text-left font-bold shadow-sm";
                 btn.innerText = "📖 " + u.name;
                 btn.onclick = () => showSummary(i);
                 listCont.appendChild(btn);
             });
-            document.getElementById('review-count').innerText = (db[curSub].wrongs ? db[curSub].wrongs.length : 0) + " 題錯題";
+            document.getElementById('review-count').innerText = (db[curSub].wrongs?.length || 0) + " 題錯題";
             showPage('page-home');
         }
 
         function showSummary(i) {
             curUnitIdx = i; const u = db[curSub].units[i];
             const isImgOn = document.getElementById('img-toggle').checked;
-            document.getElementById('unit-summary-img-container').innerHTML = (isImgOn && u.unitImg) ? `<img src="${u.unitImg}" class="fit-img shadow-lg">` : '';
+            document.getElementById('unit-summary-img-container').innerHTML = isImgOn ? createImgTag(u.unitImg) : '';
             document.getElementById('summary-title').innerText = "💡 " + u.name;
-            document.getElementById('summary-text').innerHTML = u.summary.replace(/\[(.*?)\]/g, '<span class="highlight">$1</span>');
+            document.getElementById('summary-text').innerHTML = (u.summary || "").replace(/\[(.*?)\]/g, '<span class="highlight">$1</span>');
             showPage('page-summary');
         }
 
         function startTest() {
-            testList = [...db[curSub].units[curUnitIdx].questions];
+            testList = [...(db[curSub].units[curUnitIdx].questions || [])];
             if(testList.length === 0) return alert("還沒有題目喔！");
-            const u = db[curSub].units[curUnitIdx];
             const isImgOn = document.getElementById('img-toggle').checked;
-            document.getElementById('unit-test-img-container').innerHTML = (isImgOn && u.unitImg) ? `<img src="${u.unitImg}" class="fit-img shadow-lg">` : '';
+            document.getElementById('unit-test-img-container').innerHTML = isImgOn ? createImgTag(db[curSub].units[curUnitIdx].unitImg) : '';
             curIdx = 0; updateQ(); showPage('page-test');
         }
 
@@ -346,15 +253,54 @@
         }
 
         function nextQ() { curIdx++; if(curIdx < testList.length) updateQ(); else showHome(); }
+        function forceCloseLoading() { document.getElementById('loading-overlay').classList.add('hidden'); }
+        function toggleAdmin() { document.getElementById('page-admin').classList.toggle('hidden'); }
+        function toggleImgSection() { renderAppImg(); if(curSub) showHome(); }
+        async function resetData() { if(confirm("確定清空嗎？")) { db = { settings: { imgEnabled: true }, appMainImg: '' }; await saveToCloud(); location.reload(); } }
+        function adminSelectSub(sub) {
+            curSub = sub; if(!db[sub]) db[sub] = { units: [], mainImg: '', wrongs: [] };
+            document.querySelectorAll('.admin-sub-btn').forEach(btn => {
+                btn.style.backgroundColor = btn.innerText === sub ? '#ec4899' : 'white';
+                btn.style.color = btn.innerText === sub ? 'white' : 'black';
+            });
+            document.getElementById('admin-sub-img-label').innerText = `🖼️ ${sub} 代表照片`;
+            document.getElementById('admin-sub-img-url').value = db[curSub].mainImg || '';
+            document.getElementById('admin-main-area').classList.remove('hidden');
+            document.getElementById('edit-area').classList.add('hidden');
+            renderAdminUnits();
+        }
+        function renderAdminUnits() {
+            const cont = document.getElementById('admin-unit-list'); cont.innerHTML = '';
+            (db[curSub].units || []).forEach((u, i) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-white border rounded-xl shadow-sm";
+                div.innerHTML = `<span class="font-bold text-sm">${u.name}</span><div class="space-x-2 text-xs"><button onclick="openEdit(${i})" class="text-blue-500 font-bold">編輯</button><button onclick="deleteUnit(${i})" class="text-red-400">刪除</button></div>`;
+                cont.appendChild(div);
+            });
+        }
+        function addUnitRow() { const n = prompt("單元名稱:"); if(n) { db[curSub].units.push({name: n, summary: '', questions: [], unitImg: ''}); renderAdminUnits(); } }
+        function openEdit(i) {
+            curUnitIdx = i; const u = db[curSub].units[i];
+            document.getElementById('editing-unit-name').innerText = u.name;
+            document.getElementById('admin-unit-img-url').value = u.unitImg || '';
+            document.getElementById('admin-summary').value = u.summary;
+            document.getElementById('admin-questions').value = JSON.stringify(u.questions, null, 2);
+            document.getElementById('edit-area').classList.remove('hidden');
+        }
+        function applyUnitEdit() {
+            try {
+                db[curSub].units[curUnitIdx].unitImg = document.getElementById('admin-unit-img-url').value.trim();
+                db[curSub].units[curUnitIdx].summary = document.getElementById('admin-summary').value;
+                db[curSub].units[curUnitIdx].questions = JSON.parse(document.getElementById('admin-questions').value);
+                alert("暫存成功！"); document.getElementById('edit-area').classList.add('hidden');
+            } catch(e) { alert("❌ JSON 格式錯誤！"); }
+        }
         function showPage(id) {
             ['page-subjects', 'page-home', 'page-summary', 'page-test'].forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
         function deleteUnit(i) { if(confirm("確定刪除？")) { db[curSub].units.splice(i, 1); renderAdminUnits(); } }
-        function startReview() {
-            if(!db[curSub].wrongs || db[curSub].wrongs.length === 0) return alert("沒有錯題喔！");
-            testList = [...db[curSub].wrongs]; curIdx = 0; updateQ(); showPage('page-test');
-        }
+        function startReview() { if(!db[curSub].wrongs?.length) return alert("沒有錯題喔！"); testList = [...db[curSub].wrongs]; curIdx = 0; updateQ(); showPage('page-test'); }
     </script>
 </body>
 </html>
