@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 閃耀秀彬教練 V19 (Final Fix)</title>
+    <title>✨ 閃耀秀彬教練 V20 (Final Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdf2f8; color: #333; overflow-x: hidden; }
@@ -18,6 +19,7 @@
         .fit-img { width: 100%; height: auto; max-height: 250px; object-fit: contain; background-color: #fff; border-radius: 1.5rem; margin-bottom: 1rem; pointer-events: none; }
         .soobin-bubble { background: #fff; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; color: #db2777; font-weight: bold; text-align: center; }
         .hidden { display: none !important; }
+        .result-card { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
@@ -29,12 +31,19 @@
 <body onload="loadFromCloud()">
     <nav class="p-4 flex justify-between items-center max-w-md mx-auto">
         <h1 class="text-xl font-bold text-pink-500" onclick="location.reload()" style="cursor:pointer">✨ 閃耀秀彬教練</h1>
-        <button onclick="toggleAdmin()" class="text-pink-300 p-2"><i class="fa-solid fa-gear text-2xl"></i></button>
+        <button onclick="checkPassword()" class="text-pink-300 p-2"><i class="fa-solid fa-gear text-2xl"></i></button>
     </nav>
 
     <div id="loading-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin text-4xl text-pink-500 mb-4"><i class="fa-solid fa-circle-notch"></i></div>
-        <p class="text-pink-500 font-bold">正在同步秀彬雲端內容...</p>
+        <p class="text-pink-500 font-bold">同步中...</p>
+    </div>
+
+    <div id="result-overlay" class="result-card hidden">
+        <h2 class="text-3xl font-bold text-pink-600 mb-2">測試結束！</h2>
+        <div id="score-circle" class="text-6xl font-black text-gray-800 my-6">100</div>
+        <p id="score-msg" class="text-lg font-bold text-gray-600 mb-8 whitespace-pre-line"></p>
+        <button onclick="closeResult()" class="btn-primary px-10 py-4 font-bold text-lg">回主畫面</button>
     </div>
 
     <main class="max-w-md mx-auto px-6 pb-20">
@@ -44,7 +53,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <button onclick="selectSubject('國語')" class="subject-btn">📖 國語</button>
                 <button onclick="selectSubject('英文')" class="subject-btn">🔤 英文</button>
-                <button onclick="selectSubject('公民')" class="subject-btn">⚖️ 公民</button>
+                <button onclick="selectSubject('公民')" class="subject-btn">⚖️ 公민</button>
                 <button onclick="selectSubject('地理')" class="subject-btn">🌍 地理</button>
                 <button onclick="selectSubject('生物')" class="subject-btn">🌱 生物</button>
                 <button onclick="selectSubject('歷史')" class="subject-btn">⏳ 歷史</button>
@@ -74,7 +83,11 @@
 
         <section id="page-test" class="hidden">
             <div id="unit-test-img-container" class="mb-4"></div>
-            <div class="mb-4 text-xs flex justify-between"><span id="test-title" class="font-bold text-pink-500"></span><span id="test-progress"></span></div>
+            <div class="mb-4 text-xs flex justify-between items-center">
+                <button onclick="if(confirm('確定要結束測試嗎？')) showHome()" class="bg-gray-200 px-3 py-1 rounded-full font-bold text-gray-500">✕ 停止</button>
+                <span id="test-title" class="font-bold text-pink-500"></span>
+                <span id="test-progress" class="font-bold"></span>
+            </div>
             <div class="glass p-6 min-h-[300px]">
                 <h3 id="q-text" class="text-lg font-bold mb-6"></h3>
                 <div id="options" class="space-y-3"></div>
@@ -85,19 +98,19 @@
             </div>
         </section>
 
-        <section id="page-admin" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
+        <section id="page-admin" class="hidden fixed inset-0 bg-white z-[300] p-6 overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V19)</h2>
+                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V20)</h2>
                 <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
             </div>
             <div class="space-y-6">
                 <div class="flex justify-between items-center bg-gray-100 p-4 rounded-xl">
                     <p class="font-bold text-sm text-gray-700">啟用圖片功能</p>
-                    <label class="switch"><input type="checkbox" id="img-toggle" onchange="saveSettings()" checked><span class="slider"></span></label>
+                    <label class="switch"><input type="checkbox" id="img-toggle" onchange="db.settings.imgEnabled = this.checked" checked><span class="slider"></span></label>
                 </div>
                 <div class="bg-purple-50 p-4 rounded-xl">
                     <p class="text-xs font-bold text-purple-600 mb-2">🏠 App 第一頁照片網址</p>
-                    <input type="text" id="admin-app-img-url" class="w-full p-2 text-xs border rounded" placeholder="https://i.ibb.co/...">
+                    <input type="text" id="admin-app-img-url" class="w-full p-2 text-xs border rounded">
                 </div>
                 <div>
                     <p class="text-sm font-bold text-pink-600 mb-2">1. 選擇科目管理</p>
@@ -119,7 +132,7 @@
                     <button onclick="addUnitRow()" class="w-full py-2 border-2 border-dashed border-pink-200 text-pink-400 font-bold rounded-lg">+ 新增單元</button>
                     <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4">
                         <h3 class="font-bold text-gray-700">編輯: <span id="editing-unit-name"></span></h3>
-                        <input type="text" id="admin-unit-img-url" class="w-full p-2 text-xs border rounded" placeholder="單원 이미지 주소">
+                        <input type="text" id="admin-unit-img-url" class="w-full p-2 text-xs border rounded" placeholder="單元 이미지 주소">
                         <textarea id="admin-summary" class="w-full h-40 p-3 text-xs border rounded" placeholder="重點整理..."></textarea>
                         <textarea id="admin-questions" class="w-full h-40 p-3 text-xs border rounded" placeholder="JSON 題目..."></textarea>
                         <button onclick="applyUnitEdit()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl">確認暫存</button>
@@ -134,8 +147,10 @@
         const BIN_ID = "6a005e56adc21f119a7c1f86";
         const MASTER_KEY = "$2a$10$0IMIZdF3/BKscfzxvO6MuepHI4f3d2VXiIus8mfSCo1FIPXoZVFQ.";
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        const ADMIN_PASS = "1234"; // 백오피스 비밀번호 (여기서 변경 가능!)
+
         let db = { settings: { imgEnabled: true }, appMainImg: '' };
-        let curSub = '', curUnitIdx = -1, testList = [], curIdx = 0;
+        let curSub = '', curUnitIdx = -1, testList = [], curIdx = 0, score = 0;
 
         async function loadFromCloud() {
             try {
@@ -145,7 +160,7 @@
                 document.getElementById('img-toggle').checked = db.settings?.imgEnabled ?? true;
                 document.getElementById('admin-app-img-url').value = db.appMainImg || '';
                 document.getElementById('loading-overlay').classList.add('hidden');
-                showPage('page-subjects'); // 무조건 과목 선택 화면부터 시작
+                showPage('page-subjects');
                 renderAppImg();
             } catch (e) { document.getElementById('loading-overlay').classList.add('hidden'); }
         }
@@ -154,7 +169,6 @@
             const btn = document.getElementById('final-save-btn');
             btn.innerText = "⏳ 同步中...";
             try {
-                db.settings.imgEnabled = document.getElementById('img-toggle').checked;
                 db.appMainImg = document.getElementById('admin-app-img-url').value.trim();
                 if(curSub) db[curSub].mainImg = document.getElementById('admin-sub-img-url').value.trim();
                 await fetch(API_URL, {
@@ -166,13 +180,19 @@
             } catch (e) { alert("❌ 儲存失敗"); }
         }
 
+        function checkPassword() {
+            const p = prompt("請輸入後台管理密碼:");
+            if (p === ADMIN_PASS) toggleAdmin();
+            else if (p !== null) alert("❌ 密碼錯誤！");
+        }
+
         function createImgTag(url) {
             if(!url || url.trim() === "") return "";
-            return `<img src="${url.trim()}" class="fit-img shadow-lg" onerror="this.style.display='none'">`;
+            return `<img src="${url.trim()}" class="fit-img shadow-lg">`;
         }
 
         function renderAppImg() {
-            const isImgOn = document.getElementById('img-toggle').checked;
+            const isImgOn = db.settings?.imgEnabled;
             document.getElementById('app-img-container').innerHTML = isImgOn ? createImgTag(db.appMainImg) : '';
         }
 
@@ -183,7 +203,7 @@
 
         function showHome() {
             document.getElementById('welcome-msg').innerText = curSub;
-            const isImgOn = document.getElementById('img-toggle').checked;
+            const isImgOn = db.settings?.imgEnabled;
             document.getElementById('sub-img-container').innerHTML = isImgOn ? createImgTag(db[curSub].mainImg) : '';
             const listCont = document.getElementById('unit-list-container');
             listCont.innerHTML = '';
@@ -200,7 +220,7 @@
 
         function showSummary(i) {
             curUnitIdx = i; const u = db[curSub].units[i];
-            const isImgOn = document.getElementById('img-toggle').checked;
+            const isImgOn = db.settings?.imgEnabled;
             document.getElementById('unit-summary-img-container').innerHTML = isImgOn ? createImgTag(u.unitImg) : '';
             document.getElementById('summary-title').innerText = "💡 " + u.name;
             document.getElementById('summary-text').innerHTML = (u.summary || "").replace(/\[(.*?)\]/g, '<span class="highlight">$1</span>');
@@ -208,16 +228,29 @@
         }
 
         function startTest() {
-            testList = [...(db[curSub].units[curUnitIdx].questions || [])];
-            if(testList.length === 0) return alert("還沒有題目喔！");
-            const isImgOn = document.getElementById('img-toggle').checked;
+            const originalQs = db[curSub].units[curUnitIdx].questions || [];
+            if(originalQs.length === 0) return alert("還沒有題目喔！");
+            
+            // 문제 셔플 및 보기 셔플
+            testList = originalQs.map(q => {
+                let options = q.a.map((text, idx) => ({ text, isCorrect: idx === q.correct }));
+                options.sort(() => Math.random() - 0.5); // 보기 섞기
+                return { 
+                    q: q.q, 
+                    msg: q.msg, 
+                    a: options.map(o => o.text), 
+                    correct: options.findIndex(o => o.isCorrect) 
+                };
+            }).sort(() => Math.random() - 0.5); // 문제 순서 섞기
+
+            const isImgOn = db.settings?.imgEnabled;
             document.getElementById('unit-test-img-container').innerHTML = isImgOn ? createImgTag(db[curSub].units[curUnitIdx].unitImg) : '';
-            curIdx = 0; updateQ(); showPage('page-test');
+            curIdx = 0; score = 0; updateQ(); showPage('page-test');
         }
 
         function updateQ() {
             const q = testList[curIdx];
-            document.getElementById('test-title').innerText = "✍️ " + curSub + " 測試";
+            document.getElementById('test-title').innerText = "✍️ " + curSub;
             document.getElementById('test-progress').innerText = `${curIdx + 1}/${testList.length}`;
             document.getElementById('q-text').innerText = q.q;
             document.getElementById('feedback').classList.add('hidden');
@@ -235,24 +268,54 @@
             btns.forEach(b => b.disabled = true);
             if(i === q.correct) {
                 btns[i].style.backgroundColor = '#dcfce7';
-                document.getElementById('feedback-text').innerText = "❤️ 答對了！\n" + q.msg;
+                document.getElementById('feedback-text').innerText = "❤️ 太棒了！答對了！\n" + q.msg;
+                score++;
             } else {
                 btns[i].style.backgroundColor = '#fee2e2';
                 btns[q.correct].style.backgroundColor = '#dcfce7';
-                document.getElementById('feedback-text').innerText = "😭 答錯了！\n" + q.msg;
+                document.getElementById('feedback-text').innerText = "😭 哎呀！答錯了。\n" + q.msg;
                 if(!db[curSub].wrongs) db[curSub].wrongs = [];
                 if(!db[curSub].wrongs.find(w => w.q === q.q)) db[curSub].wrongs.push(q);
             }
             document.getElementById('feedback').classList.remove('hidden');
         }
 
-        function nextQ() { curIdx++; if(curIdx < testList.length) updateQ(); else showHome(); }
+        function nextQ() { 
+            curIdx++; 
+            if(curIdx < testList.length) updateQ(); 
+            else finishTest(); 
+        }
+
+        function finishTest() {
+            const finalScore = Math.round((score / testList.length) * 100);
+            document.getElementById('score-circle').innerText = finalScore;
+            let msg = "";
+            if(finalScore === 100) {
+                msg = "🎉 太完美了！你是秀彬教練的驕傲！\n獎勵你一顆閃耀的大星星！";
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            } else if(finalScore >= 80) {
+                msg = "👏 非常優秀！離滿分只差一點點了！\n再接再厲，你一定可以的！";
+            } else if(finalScore >= 50) {
+                msg = "💪 不錯喔！已經掌握了一半以上。\n秀彬教練會陪你一起努力！";
+            } else {
+                msg = "🌱 沒關係，失敗是成功的基石！\n多看幾次重點，下次一定更進步！";
+            }
+            document.getElementById('score-msg').innerText = msg;
+            document.getElementById('result-overlay').classList.remove('hidden');
+        }
+
+        function closeResult() {
+            document.getElementById('result-overlay').classList.add('hidden');
+            showHome();
+        }
+
         function toggleAdmin() { document.getElementById('page-admin').classList.toggle('hidden'); }
         function showPage(id) {
             ['page-subjects', 'page-home', 'page-summary', 'page-test'].forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0,0);
         }
+
         function adminSelectSub(sub) {
             curSub = sub; if(!db[sub]) db[sub] = { units: [], mainImg: '', wrongs: [] };
             document.getElementById('admin-sub-img-label').innerText = `🖼️ ${sub} 列表照`;
@@ -287,7 +350,7 @@
             } catch(e) { alert("JSON 錯誤"); }
         }
         function deleteUnit(i) { if(confirm("確定刪除？")) { db[curSub].units.splice(i, 1); renderAdminUnits(); } }
-        function startReview() { if(!db[curSub].wrongs?.length) return alert("沒有錯題"); testList = [...db[curSub].wrongs]; curIdx = 0; updateQ(); showPage('page-test'); }
+        function startReview() { if(!db[curSub].wrongs?.length) return alert("沒有錯題"); testList = [...db[curSub].wrongs].sort(() => Math.random() - 0.5); curIdx = 0; score = 0; updateQ(); showPage('page-test'); }
     </script>
 </body>
 </html>
