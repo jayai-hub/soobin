@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 閃耀秀彬教練 V18 (Clean Image)</title>
+    <title>✨ 閃耀秀彬教練 V19 (Final Fix)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdf2f8; color: #333; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdf2f8; color: #333; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.95); border-radius: 1.5rem; border: 1px solid rgba(255, 192, 203, 0.3); }
         .btn-primary { background: linear-gradient(45deg, #ff75c3, #ffad71); color: white; border:none; border-radius: 1rem; cursor: pointer; }
-        .subject-btn { background: white; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .subject-btn { background: white; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; position: relative; z-index: 10; }
         .subject-btn:hover { background-color: #fce7f3; transform: translateY(-2px); }
         .summary-box { white-space: pre-wrap; line-height: 1.8; font-size: 1.05rem; }
         .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 4px; font-weight: bold; color: #92400e; }
-        .fit-img { width: 100%; height: auto; max-height: 300px; object-fit: contain; background-color: #fff; border-radius: 1.5rem; margin-bottom: 1rem; }
+        .fit-img { width: 100%; height: auto; max-height: 250px; object-fit: contain; background-color: #fff; border-radius: 1.5rem; margin-bottom: 1rem; pointer-events: none; }
         .soobin-bubble { background: #fff; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; color: #db2777; font-weight: bold; text-align: center; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
@@ -35,25 +35,24 @@
     <div id="loading-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin text-4xl text-pink-500 mb-4"><i class="fa-solid fa-circle-notch"></i></div>
         <p class="text-pink-500 font-bold">正在同步秀彬雲端內容...</p>
-        <button onclick="forceCloseLoading()" class="mt-10 text-xs text-gray-300 underline">如果卡住太久，請點此跳過</button>
     </div>
 
     <main class="max-w-md mx-auto px-6 pb-20">
         <section id="page-subjects">
-            <div id="app-img-container"></div>
+            <div id="app-img-container" class="mb-4"></div>
             <div class="soobin-bubble">"今天也要跟我一起加油學習喔！<br>想先看哪個科目呢？"</div>
             <div class="grid grid-cols-2 gap-4">
-                <div onclick="selectSubject('國語')" class="subject-btn text-center">📖 國語</div>
-                <div onclick="selectSubject('英文')" class="subject-btn text-center">🔤 英文</div>
-                <div onclick="selectSubject('公民')" class="subject-btn text-center">⚖️ 公民</div>
-                <div onclick="selectSubject('地理')" class="subject-btn text-center">🌍 地理</div>
-                <div onclick="selectSubject('生物')" class="subject-btn text-center">🌱 生物</div>
-                <div onclick="selectSubject('歷史')" class="subject-btn text-center">⏳ 歷史</div>
+                <button onclick="selectSubject('國語')" class="subject-btn">📖 國語</button>
+                <button onclick="selectSubject('英文')" class="subject-btn">🔤 英文</button>
+                <button onclick="selectSubject('公民')" class="subject-btn">⚖️ 公民</button>
+                <button onclick="selectSubject('地理')" class="subject-btn">🌍 地理</button>
+                <button onclick="selectSubject('生物')" class="subject-btn">🌱 生物</button>
+                <button onclick="selectSubject('歷史')" class="subject-btn">⏳ 歷史</button>
             </div>
         </section>
 
         <section id="page-home" class="hidden text-center">
-            <div id="sub-img-container"></div>
+            <div id="sub-img-container" class="mb-4"></div>
             <button onclick="location.reload()" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 選其他科目</button>
             <h2 id="welcome-msg" class="text-2xl font-bold text-gray-800 mb-6"></h2>
             <div id="unit-list-container" class="space-y-3 text-left"></div>
@@ -64,17 +63,17 @@
         </section>
 
         <section id="page-summary" class="hidden space-y-4">
-            <div id="unit-summary-img-container"></div>
+            <div id="unit-summary-img-container" class="mb-4"></div>
             <div class="glass p-6">
                 <h2 id="summary-title" class="text-lg font-bold mb-4 text-pink-600 border-b pb-2"></h2>
                 <div id="summary-text" class="summary-box text-gray-700"></div>
             </div>
             <button onclick="startTest()" class="btn-primary w-full py-4 font-bold text-lg">複習完畢，開始測試！</button>
-            <button onclick="showHome()" class="w-full text-gray-400 text-sm underline mt-2">返回單元列表</button>
+            <button onclick="showPage('page-home')" class="w-full text-gray-400 text-sm underline mt-2">返回單元列表</button>
         </section>
 
         <section id="page-test" class="hidden">
-            <div id="unit-test-img-container"></div>
+            <div id="unit-test-img-container" class="mb-4"></div>
             <div class="mb-4 text-xs flex justify-between"><span id="test-title" class="font-bold text-pink-500"></span><span id="test-progress"></span></div>
             <div class="glass p-6 min-h-[300px]">
                 <h3 id="q-text" class="text-lg font-bold mb-6"></h3>
@@ -88,23 +87,20 @@
 
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V18)</h2>
+                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V19)</h2>
                 <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
             </div>
-
             <div class="space-y-6">
                 <div class="flex justify-between items-center bg-gray-100 p-4 rounded-xl">
-                    <div><p class="font-bold text-sm text-gray-700">啟用圖片功能</p></div>
-                    <label class="switch"><input type="checkbox" id="img-toggle" onchange="toggleImgSection()" checked><span class="slider"></span></label>
+                    <p class="font-bold text-sm text-gray-700">啟用圖片功能</p>
+                    <label class="switch"><input type="checkbox" id="img-toggle" onchange="saveSettings()" checked><span class="slider"></span></label>
                 </div>
-
                 <div class="bg-purple-50 p-4 rounded-xl">
-                    <p class="text-xs font-bold text-purple-600 mb-2">🏠 App 第一頁照片 (Main Image)</p>
-                    <input type="text" id="admin-app-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上網址">
+                    <p class="text-xs font-bold text-purple-600 mb-2">🏠 App 第一頁照片網址</p>
+                    <input type="text" id="admin-app-img-url" class="w-full p-2 text-xs border rounded" placeholder="https://i.ibb.co/...">
                 </div>
-
                 <div>
-                    <p class="text-sm font-bold text-pink-600 mb-2">1. 選擇科目</p>
+                    <p class="text-sm font-bold text-pink-600 mb-2">1. 選擇科目管理</p>
                     <div class="grid grid-cols-3 gap-2">
                         <button onclick="adminSelectSub('國語')" class="admin-sub-btn border p-2 rounded text-xs">國語</button>
                         <button onclick="adminSelectSub('英文')" class="admin-sub-btn border p-2 rounded text-xs">英文</button>
@@ -114,29 +110,22 @@
                         <button onclick="adminSelectSub('歷史')" class="admin-sub-btn border p-2 rounded text-xs">歷史</button>
                     </div>
                 </div>
-
                 <div id="admin-main-area" class="hidden space-y-6">
                     <div class="bg-blue-50 p-4 rounded-xl">
                         <p id="admin-sub-img-label" class="text-xs font-bold text-blue-600 mb-2"></p>
-                        <input type="text" id="admin-sub-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上網址">
+                        <input type="text" id="admin-sub-img-url" class="w-full p-2 text-xs border rounded">
                     </div>
                     <div id="admin-unit-list" class="space-y-2"></div>
-                    <button onclick="addUnitRow()" class="w-full py-2 border-2 border-dashed border-pink-200 text-pink-400 text-sm font-bold rounded-lg">+ 新增單元</button>
-                    
+                    <button onclick="addUnitRow()" class="w-full py-2 border-2 border-dashed border-pink-200 text-pink-400 font-bold rounded-lg">+ 新增單元</button>
                     <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4">
-                        <h3 class="font-bold text-gray-700">編輯: <span id="editing-unit-name" class="text-pink-500"></span></h3>
-                        <div class="p-3 bg-pink-50 rounded-lg">
-                            <p class="text-[10px] font-bold text-pink-400 mb-1">🖼️ 單元教學圖片 (Unit Image)</p>
-                            <input type="text" id="admin-unit-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上網址">
-                        </div>
+                        <h3 class="font-bold text-gray-700">編輯: <span id="editing-unit-name"></span></h3>
+                        <input type="text" id="admin-unit-img-url" class="w-full p-2 text-xs border rounded" placeholder="單원 이미지 주소">
                         <textarea id="admin-summary" class="w-full h-40 p-3 text-xs border rounded" placeholder="重點整理..."></textarea>
                         <textarea id="admin-questions" class="w-full h-40 p-3 text-xs border rounded" placeholder="JSON 題目..."></textarea>
-                        <button onclick="applyUnitEdit()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl">確認暫存修改</button>
+                        <button onclick="applyUnitEdit()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl">確認暫存</button>
                     </div>
                 </div>
-
                 <button id="final-save-btn" onclick="saveToCloud()" class="w-full py-5 bg-gray-800 text-white font-bold rounded-2xl shadow-xl text-lg mt-10">💾 儲存並同步至雲端</button>
-                <div class="bg-red-50 p-4 rounded-xl mt-10"><button onclick="resetData()" class="w-full py-2 bg-red-500 text-white text-xs font-bold rounded">數據初始化 (慎用)</button></div>
             </div>
         </section>
     </main>
@@ -155,8 +144,10 @@
                 db = data.record || db;
                 document.getElementById('img-toggle').checked = db.settings?.imgEnabled ?? true;
                 document.getElementById('admin-app-img-url').value = db.appMainImg || '';
-                forceCloseLoading(); renderAppImg();
-            } catch (e) { forceCloseLoading(); }
+                document.getElementById('loading-overlay').classList.add('hidden');
+                showPage('page-subjects'); // 무조건 과목 선택 화면부터 시작
+                renderAppImg();
+            } catch (e) { document.getElementById('loading-overlay').classList.add('hidden'); }
         }
 
         async function saveToCloud() {
@@ -171,20 +162,23 @@
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(db)
                 });
-                alert("✅ 儲存成功！"); toggleAdmin(); renderAppImg(); if(curSub) showHome();
+                alert("✅ 儲存成功！"); location.reload();
             } catch (e) { alert("❌ 儲存失敗"); }
-            finally { btn.innerText = "💾 儲存並同步至雲端"; }
         }
 
         function createImgTag(url) {
             if(!url || url.trim() === "") return "";
-            const cleanUrl = url.trim().replace(/['">]/g, ""); // 위험한 문자 제거
-            return `<img src="${cleanUrl}" class="fit-img shadow-lg" onerror="this.style.display='none'">`;
+            return `<img src="${url.trim()}" class="fit-img shadow-lg" onerror="this.style.display='none'">`;
         }
 
         function renderAppImg() {
             const isImgOn = document.getElementById('img-toggle').checked;
             document.getElementById('app-img-container').innerHTML = isImgOn ? createImgTag(db.appMainImg) : '';
+        }
+
+        function selectSubject(sub) {
+            curSub = sub; if(!db[sub]) db[sub] = { units: [], mainImg: '', wrongs: [] };
+            showHome();
         }
 
         function showHome() {
@@ -195,7 +189,7 @@
             listCont.innerHTML = '';
             (db[curSub].units || []).forEach((u, i) => {
                 const btn = document.createElement('button');
-                btn.className = "glass w-full p-5 text-left font-bold shadow-sm";
+                btn.className = "glass w-full p-5 text-left font-bold shadow-sm mb-2";
                 btn.innerText = "📖 " + u.name;
                 btn.onclick = () => showSummary(i);
                 listCont.appendChild(btn);
@@ -223,14 +217,14 @@
 
         function updateQ() {
             const q = testList[curIdx];
-            document.getElementById('test-title').innerText = "✍️ 秀彬小測試";
+            document.getElementById('test-title').innerText = "✍️ " + curSub + " 測試";
             document.getElementById('test-progress').innerText = `${curIdx + 1}/${testList.length}`;
             document.getElementById('q-text').innerText = q.q;
             document.getElementById('feedback').classList.add('hidden');
             const optCont = document.getElementById('options'); optCont.innerHTML = '';
             q.a.forEach((a, i) => {
                 const b = document.createElement('button');
-                b.className = "w-full text-left p-4 rounded-xl border bg-white text-sm hover:bg-pink-50";
+                b.className = "w-full text-left p-4 rounded-xl border bg-white font-medium hover:bg-pink-50";
                 b.innerText = a; b.onclick = () => checkAns(i); optCont.appendChild(b);
             });
         }
@@ -245,7 +239,7 @@
             } else {
                 btns[i].style.backgroundColor = '#fee2e2';
                 btns[q.correct].style.backgroundColor = '#dcfce7';
-                document.getElementById('feedback-text').innerText = "😭 答錯了！看這裡：\n" + q.msg;
+                document.getElementById('feedback-text').innerText = "😭 答錯了！\n" + q.msg;
                 if(!db[curSub].wrongs) db[curSub].wrongs = [];
                 if(!db[curSub].wrongs.find(w => w.q === q.q)) db[curSub].wrongs.push(q);
             }
@@ -253,28 +247,25 @@
         }
 
         function nextQ() { curIdx++; if(curIdx < testList.length) updateQ(); else showHome(); }
-        function forceCloseLoading() { document.getElementById('loading-overlay').classList.add('hidden'); }
         function toggleAdmin() { document.getElementById('page-admin').classList.toggle('hidden'); }
-        function toggleImgSection() { renderAppImg(); if(curSub) showHome(); }
-        async function resetData() { if(confirm("確定清空嗎？")) { db = { settings: { imgEnabled: true }, appMainImg: '' }; await saveToCloud(); location.reload(); } }
+        function showPage(id) {
+            ['page-subjects', 'page-home', 'page-summary', 'page-test'].forEach(p => document.getElementById(p).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
         function adminSelectSub(sub) {
             curSub = sub; if(!db[sub]) db[sub] = { units: [], mainImg: '', wrongs: [] };
-            document.querySelectorAll('.admin-sub-btn').forEach(btn => {
-                btn.style.backgroundColor = btn.innerText === sub ? '#ec4899' : 'white';
-                btn.style.color = btn.innerText === sub ? 'white' : 'black';
-            });
-            document.getElementById('admin-sub-img-label').innerText = `🖼️ ${sub} 代表照片`;
+            document.getElementById('admin-sub-img-label').innerText = `🖼️ ${sub} 列表照`;
             document.getElementById('admin-sub-img-url').value = db[curSub].mainImg || '';
             document.getElementById('admin-main-area').classList.remove('hidden');
-            document.getElementById('edit-area').classList.add('hidden');
             renderAdminUnits();
         }
         function renderAdminUnits() {
             const cont = document.getElementById('admin-unit-list'); cont.innerHTML = '';
             (db[curSub].units || []).forEach((u, i) => {
                 const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-white border rounded-xl shadow-sm";
-                div.innerHTML = `<span class="font-bold text-sm">${u.name}</span><div class="space-x-2 text-xs"><button onclick="openEdit(${i})" class="text-blue-500 font-bold">編輯</button><button onclick="deleteUnit(${i})" class="text-red-400">刪除</button></div>`;
+                div.className = "flex justify-between items-center p-3 bg-white border rounded-xl mb-2";
+                div.innerHTML = `<span>${u.name}</span><div class="space-x-2"><button onclick="openEdit(${i})" class="text-blue-500">編輯</button><button onclick="deleteUnit(${i})" class="text-red-400">刪除</button></div>`;
                 cont.appendChild(div);
             });
         }
@@ -292,15 +283,11 @@
                 db[curSub].units[curUnitIdx].unitImg = document.getElementById('admin-unit-img-url').value.trim();
                 db[curSub].units[curUnitIdx].summary = document.getElementById('admin-summary').value;
                 db[curSub].units[curUnitIdx].questions = JSON.parse(document.getElementById('admin-questions').value);
-                alert("暫存成功！"); document.getElementById('edit-area').classList.add('hidden');
-            } catch(e) { alert("❌ JSON 格式錯誤！"); }
-        }
-        function showPage(id) {
-            ['page-subjects', 'page-home', 'page-summary', 'page-test'].forEach(p => document.getElementById(p).classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
+                alert("暫存成功"); document.getElementById('edit-area').classList.add('hidden');
+            } catch(e) { alert("JSON 錯誤"); }
         }
         function deleteUnit(i) { if(confirm("確定刪除？")) { db[curSub].units.splice(i, 1); renderAdminUnits(); } }
-        function startReview() { if(!db[curSub].wrongs?.length) return alert("沒有錯題喔！"); testList = [...db[curSub].wrongs]; curIdx = 0; updateQ(); showPage('page-test'); }
+        function startReview() { if(!db[curSub].wrongs?.length) return alert("沒有錯題"); testList = [...db[curSub].wrongs]; curIdx = 0; updateQ(); showPage('page-test'); }
     </script>
 </body>
 </html>
