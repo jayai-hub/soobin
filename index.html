@@ -280,4 +280,61 @@
             curUnitIdx = i; const u = db[curSub].units[i];
             const isImgOn = document.getElementById('img-toggle').checked;
             document.getElementById('unit-summary-img-container').innerHTML = (isImgOn && u.unitImg) ? `<img src="${u.unitImg}" class="fit-img shadow-lg">` : '';
-            document.getElementById('summary-title
+            document.getElementById('summary-title').innerText = "💡 " + u.name;
+            document.getElementById('summary-text').innerHTML = u.summary.replace(/\[(.*?)\]/g, '<span class="highlight">$1</span>');
+            showPage('page-summary');
+        }
+
+        function startTest() {
+            testList = [...db[curSub].units[curUnitIdx].questions];
+            if(testList.length === 0) return alert("還沒有題目喔！");
+            const u = db[curSub].units[curUnitIdx];
+            const isImgOn = document.getElementById('img-toggle').checked;
+            document.getElementById('unit-test-img-container').innerHTML = (isImgOn && u.unitImg) ? `<img src="${u.unitImg}" class="fit-img shadow-lg">` : '';
+            curIdx = 0; updateQ(); showPage('page-test');
+        }
+
+        function updateQ() {
+            const q = testList[curIdx];
+            document.getElementById('test-title').innerText = "✍️ 秀彬小測試";
+            document.getElementById('test-progress').innerText = `${curIdx + 1}/${testList.length}`;
+            document.getElementById('q-text').innerText = q.q;
+            document.getElementById('feedback').classList.add('hidden');
+            const optCont = document.getElementById('options'); optCont.innerHTML = '';
+            q.a.forEach((a, i) => {
+                const b = document.createElement('button');
+                b.className = "w-full text-left p-4 rounded-xl border bg-white text-sm font-medium hover:bg-pink-50";
+                b.innerText = a; b.onclick = () => checkAns(i); optCont.appendChild(b);
+            });
+        }
+
+        function checkAns(i) {
+            const q = testList[curIdx];
+            const btns = document.getElementById('options').querySelectorAll('button');
+            btns.forEach(b => b.disabled = true);
+            if(i === q.correct) {
+                btns[i].style.backgroundColor = '#dcfce7';
+                document.getElementById('feedback-text').innerText = "❤️ 答對了！\n" + q.msg;
+            } else {
+                btns[i].style.backgroundColor = '#fee2e2';
+                btns[q.correct].style.backgroundColor = '#dcfce7';
+                document.getElementById('feedback-text').innerText = "😭 沒關係，看這裡！\n" + q.msg;
+                if(!db[curSub].wrongs) db[curSub].wrongs = [];
+                if(!db[curSub].wrongs.find(w => w.q === q.q)) db[curSub].wrongs.push(q);
+            }
+            document.getElementById('feedback').classList.remove('hidden');
+        }
+
+        function nextQ() { curIdx++; if(curIdx < testList.length) updateQ(); else showHome(); }
+        function showPage(id) {
+            ['page-subjects', 'page-home', 'page-summary', 'page-test'].forEach(p => document.getElementById(p).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function deleteUnit(i) { if(confirm("確定刪除？")) { db[curSub].units.splice(i, 1); renderAdminUnits(); } }
+        function startReview() {
+            if(!db[curSub].wrongs || db[curSub].wrongs.length === 0) return alert("秀彬: 現在沒有錯題喔！");
+            testList = [...db[curSub].wrongs]; curIdx = 0; updateQ(); showPage('page-test');
+        }
+    </script>
+</body>
+</html>
