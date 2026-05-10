@@ -30,7 +30,7 @@
 </head>
 <body onload="loadFromCloud()">
     <nav class="p-4 flex justify-between items-center max-w-md mx-auto">
-        <h1 class="text-xl font-bold text-pink-500" onclick="location.reload()" style="cursor:pointer">✨ 閃耀秀彬教練</h1>
+        <h1 class="text-xl font-bold text-pink-500" onclick="location.reload()" style="cursor:pointer">✨ 수제비 선생님</h1>
         <button onclick="checkPassword()" class="text-pink-300 p-2"><i class="fa-solid fa-gear text-2xl"></i></button>
     </nav>
 
@@ -291,12 +291,12 @@
             document.getElementById('score-circle').innerText = finalScore;
             let msg = "";
             if(finalScore === 100) {
-                msg = "🎉 太完美了！你是秀彬教練的驕傲！\n獎勵你一顆閃耀的大星星！";
+                msg = "🎉 太完美了！你是수제비 선생님的驕傲！\n獎勵你一顆閃耀的大星星！";
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             } else if(finalScore >= 80) {
                 msg = "👏 非常優秀！離滿分只差一點點了！\n再接再厲，你一定可以的！";
             } else if(finalScore >= 50) {
-                msg = "💪 不錯喔！已經掌握了一半以上。\n秀彬教練會陪你一起努力！";
+                msg = "💪 不錯喔！已經掌握了一半以上。\n수제비 선생님會陪你一起努力！";
             } else {
                 msg = "🌱 沒關係，失敗是成功的基石！\n多看幾次重點，下次一定更進步！";
             }
