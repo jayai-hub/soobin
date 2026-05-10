@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 閃耀秀彬教練 V13 (Cloud Sync)</title>
+    <title>✨ 閃耀秀彬教練 V14 (Cloud & Link)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -15,7 +15,7 @@
         .subject-btn:hover { background-color: #fce7f3; transform: translateY(-2px); }
         .summary-box { white-space: pre-wrap; line-height: 1.8; font-size: 1.05rem; }
         .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 4px; font-weight: bold; color: #92400e; }
-        .fit-img { width: 100%; height: 200px; object-fit: contain; background-color: #000; border-radius: 1.5rem; }
+        .fit-img { width: 100%; height: 200px; object-fit: contain; background-color: #000; border-radius: 1.5rem; margin-bottom: 1rem; }
         .soobin-bubble { background: #fff; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; color: #db2777; font-weight: bold; text-align: center; }
         .hidden { display: none; }
     </style>
@@ -28,12 +28,12 @@
 
     <div id="loading-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
         <div class="animate-spin text-4xl text-pink-500 mb-4"><i class="fa-solid fa-circle-notch"></i></div>
-        <p class="text-pink-500 font-bold">正在連接秀彬雲端創庫...</p>
+        <p class="text-pink-500 font-bold">正在同步雲端內容...</p>
     </div>
 
     <main class="max-w-md mx-auto px-6 pb-20">
         <section id="page-subjects">
-            <div class="soobin-bubble">"今天也要跟我一起加油學習喔！<br>內容已與雲端同步完成 ✨"</div>
+            <div class="soobin-bubble">"今天也要跟我一起加油學習喔！<br>想先看哪個科目呢？"</div>
             <div class="grid grid-cols-2 gap-4">
                 <div onclick="selectSubject('國語')" class="subject-btn text-center">📖 國語</div>
                 <div onclick="selectSubject('英文')" class="subject-btn text-center">🔤 英文</div>
@@ -45,10 +45,14 @@
         </section>
 
         <section id="page-home" class="hidden text-center">
-            <div id="main-img-container" class="mb-4"></div>
+            <div id="main-img-container"></div>
             <button onclick="location.reload()" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 選其他科目</button>
             <h2 id="welcome-msg" class="text-2xl font-bold text-gray-800 mb-6"></h2>
             <div id="unit-list-container" class="space-y-3 text-left"></div>
+            <button onclick="startReview()" class="glass w-full p-4 mt-6 border-2 border-orange-200 text-left">
+                <div class="font-bold text-pink-600">📒 挑戰秀彬幫你整理的錯題本</div>
+                <p id="review-count" class="text-xs text-gray-400"></p>
+            </button>
         </section>
 
         <section id="page-summary" class="hidden space-y-4">
@@ -74,89 +78,99 @@
 
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 雲端管理後台</h2>
+                <h2 class="text-xl font-bold text-gray-800">🐰 雲端智慧後台</h2>
                 <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
             </div>
+
             <div class="space-y-6">
-                <p class="text-xs text-green-600 font-bold font-mono">Status: Cloud Connected (JSONBin)</p>
-                <div class="grid grid-cols-3 gap-2">
-                    <button onclick="adminSelectSub('國語')" class="admin-sub-btn border p-2 rounded text-xs">國語</button>
-                    <button onclick="adminSelectSub('英文')" class="admin-sub-btn border p-2 rounded text-xs">英文</button>
-                    <button onclick="adminSelectSub('公民')" class="admin-sub-btn border p-2 rounded text-xs">公民</button>
-                    <button onclick="adminSelectSub('地理')" class="admin-sub-btn border p-2 rounded text-xs">地理</button>
-                    <button onclick="adminSelectSub('生物')" class="admin-sub-btn border p-2 rounded text-xs">生物</button>
-                    <button onclick="adminSelectSub('歷史')" class="admin-sub-btn border p-2 rounded text-xs">歷史</button>
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <p class="text-xs font-bold text-blue-600 mb-2">🖼️ 圖片網址設定 (請貼上圖片連結)</p>
+                    <div class="space-y-2">
+                        <input type="text" id="admin-main-img-url" class="w-full p-2 text-xs border rounded" placeholder="貼上首頁圖片網址 (http...)">
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-sm font-bold text-pink-600 mb-2">1. 選擇科目</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="adminSelectSub('國語')" class="admin-sub-btn border p-2 rounded text-xs">國語</button>
+                        <button onclick="adminSelectSub('英文')" class="admin-sub-btn border p-2 rounded text-xs">英文</button>
+                        <button onclick="adminSelectSub('公民')" class="admin-sub-btn border p-2 rounded text-xs">公民</button>
+                        <button onclick="adminSelectSub('地理')" class="admin-sub-btn border p-2 rounded text-xs">地理</button>
+                        <button onclick="adminSelectSub('生物')" class="admin-sub-btn border p-2 rounded text-xs">生物</button>
+                        <button onclick="adminSelectSub('歷史')" class="admin-sub-btn border p-2 rounded text-xs">歷史</button>
+                    </div>
                 </div>
 
                 <div id="admin-main-area" class="hidden space-y-6">
                     <div>
-                        <p class="text-sm font-bold text-pink-600 mb-2">單元管理</p>
+                        <p class="text-sm font-bold text-pink-600 mb-2">2. 單元管理</p>
                         <div id="admin-unit-list" class="space-y-2 mb-4"></div>
                         <button onclick="addUnitRow()" class="w-full py-2 border-2 border-dashed border-pink-200 text-pink-400 text-sm font-bold rounded-lg">+ 新增單元</button>
                     </div>
-                    <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4">
-                        <h3 class="font-bold text-gray-700">編輯: <span id="editing-unit-name"></span></h3>
+
+                    <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4 shadow-inner">
+                        <h3 class="font-bold text-gray-700">編輯中: <span id="editing-unit-name" class="text-pink-500"></span></h3>
                         <textarea id="admin-summary" class="w-full h-40 p-3 text-xs border rounded bg-gray-50" placeholder="貼上重點整理..."></textarea>
                         <textarea id="admin-questions" class="w-full h-40 p-3 text-xs border rounded font-mono bg-gray-50" placeholder="貼上 JSON 題目..."></textarea>
-                        <button onclick="applyUnitEdit()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl">暫存修改</button>
+                        <button onclick="applyUnitEdit()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl">確認暫存修改</button>
                     </div>
                 </div>
+
                 <button id="final-save-btn" onclick="saveToCloud()" class="w-full py-5 bg-gray-800 text-white font-bold rounded-2xl shadow-xl text-lg mt-10">💾 儲存並同步至雲端</button>
             </div>
         </section>
     </main>
 
     <script>
+        // 클라우드 설정
         const BIN_ID = "6a005e56adc21f119a7c1f86";
         const MASTER_KEY = "$2a$10$0IMIZdF3/BKscfzxvO6MuepHI4f3d2VXiIus8mfSCo1FIPXoZVFQ.";
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-        let masterDB = {};
+        let db = { settings: { imgEnabled: true } };
         let curSub = '', curUnitIdx = -1, testList = [], curIdx = 0;
 
         async function loadFromCloud() {
             try {
                 const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY } });
                 const data = await res.json();
-                masterDB = data.record;
+                db = data.record;
                 document.getElementById('loading-overlay').classList.add('hidden');
-            } catch (e) {
-                alert("雲端讀取失敗，請確認網路或 API Key！");
-            }
+            } catch (e) { alert("雲端同步失敗！"); }
         }
 
         async function saveToCloud() {
             const btn = document.getElementById('final-save-btn');
             btn.innerText = "⏳ 正在同步至雲端...";
-            btn.disabled = true;
             try {
+                // 저장 전 이미지 URL 업데이트
+                if(curSub) db[curSub].mainImg = document.getElementById('admin-main-img-url').value;
+                
                 const res = await fetch(API_URL, {
                     method: 'PUT',
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
-                    body: JSON.stringify(masterDB)
+                    body: JSON.stringify(db)
                 });
                 if(res.ok) {
-                    alert("✅ 雲단 同步成功！女兒看到的也會是最新版。");
+                    alert("✅ 儲存並同步成功！");
                     toggleAdmin();
                     if(curSub) showHome();
                 }
-            } catch (e) {
-                alert("❌ 同步失敗！");
-            } finally {
-                btn.innerText = "💾 儲存並同步至雲端";
-                btn.disabled = false;
-            }
+            } catch (e) { alert("❌ 儲存失敗！"); }
+            finally { btn.innerText = "💾 儲存並同步至雲端"; }
         }
 
         function toggleAdmin() { document.getElementById('page-admin').classList.toggle('hidden'); }
 
         function adminSelectSub(sub) {
             curSub = sub;
-            if(!masterDB[sub]) masterDB[sub] = { units: [], wrongs: [] };
+            if(!db[sub]) db[sub] = { units: [], mainImg: '', wrongs: [] };
             document.querySelectorAll('.admin-sub-btn').forEach(btn => {
                 btn.style.backgroundColor = btn.innerText === sub ? '#ec4899' : 'white';
                 btn.style.color = btn.innerText === sub ? 'white' : 'black';
             });
+            document.getElementById('admin-main-img-url').value = db[curSub].mainImg || '';
             document.getElementById('admin-main-area').classList.remove('hidden');
             document.getElementById('edit-area').classList.add('hidden');
             renderAdminUnits();
@@ -164,7 +178,7 @@
 
         function renderAdminUnits() {
             const cont = document.getElementById('admin-unit-list'); cont.innerHTML = '';
-            masterDB[curSub].units.forEach((u, i) => {
+            db[curSub].units.forEach((u, i) => {
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center p-3 bg-white border rounded-xl shadow-sm";
                 div.innerHTML = `<span class="font-bold text-sm">${u.name}</span>
@@ -178,11 +192,11 @@
 
         function addUnitRow() {
             const n = prompt("請輸入單元名稱:");
-            if(n) { masterDB[curSub].units.push({name: n, summary: '', questions: []}); renderAdminUnits(); }
+            if(n) { db[curSub].units.push({name: n, summary: '', questions: []}); renderAdminUnits(); }
         }
 
         function openEdit(i) {
-            curUnitIdx = i; const u = masterDB[curSub].units[i];
+            curUnitIdx = i; const u = db[curSub].units[i];
             document.getElementById('editing-unit-name').innerText = u.name;
             document.getElementById('admin-summary').value = u.summary;
             document.getElementById('admin-questions').value = JSON.stringify(u.questions, null, 2);
@@ -191,43 +205,45 @@
 
         function applyUnitEdit() {
             try {
-                const s = document.getElementById('admin-summary').value;
-                const q = JSON.parse(document.getElementById('admin-questions').value);
-                masterDB[curSub].units[curUnitIdx].summary = s;
-                masterDB[curSub].units[curUnitIdx].questions = q;
-                alert("暫存成功，別忘了點擊下方的『同步至雲端』按鈕喔！");
+                db[curSub].units[curUnitIdx].summary = document.getElementById('admin-summary').value;
+                db[curSub].units[curUnitIdx].questions = JSON.parse(document.getElementById('admin-questions').value);
+                alert("暫存成功！記得最後要點擊同步按鈕。");
                 document.getElementById('edit-area').classList.add('hidden');
             } catch(e) { alert("❌ JSON 格式錯誤！"); }
         }
 
         function selectSubject(sub) {
-            curSub = sub; if(!masterDB[sub]) masterDB[sub] = { units: [], wrongs: [] };
+            curSub = sub; if(!db[sub]) db[sub] = { units: [], mainImg: '', wrongs: [] };
             showHome();
         }
 
         function showHome() {
             document.getElementById('welcome-msg').innerText = curSub;
+            const imgCont = document.getElementById('main-img-container');
+            imgCont.innerHTML = db[curSub].mainImg ? `<img src="${db[curSub].mainImg}" class="fit-img shadow-lg">` : '';
+            
             const listCont = document.getElementById('unit-list-container');
             listCont.innerHTML = '';
-            masterDB[curSub].units.forEach((u, i) => {
+            db[curSub].units.forEach((u, i) => {
                 const btn = document.createElement('button');
                 btn.className = "glass w-full p-5 text-left font-bold shadow-sm hover:bg-pink-50";
                 btn.innerText = "📖 " + u.name;
                 btn.onclick = () => showSummary(i);
                 listCont.appendChild(btn);
             });
+            document.getElementById('review-count').innerText = (db[curSub].wrongs ? db[curSub].wrongs.length : 0) + " 題錯題";
             showPage('page-home');
         }
 
         function showSummary(i) {
-            curUnitIdx = i; const u = masterDB[curSub].units[i];
+            curUnitIdx = i; const u = db[curSub].units[i];
             document.getElementById('summary-title').innerText = "💡 " + u.name;
             document.getElementById('summary-text').innerHTML = u.summary.replace(/\[(.*?)\]/g, '<span class="highlight">$1</span>');
             showPage('page-summary');
         }
 
         function startTest() {
-            testList = [...masterDB[curSub].units[curUnitIdx].questions];
+            testList = [...db[curSub].units[curUnitIdx].questions];
             if(testList.length === 0) return alert("還沒有題目喔！");
             curIdx = 0; updateQ(); showPage('page-test');
         }
@@ -257,6 +273,8 @@
                 btns[i].style.backgroundColor = '#fee2e2';
                 btns[q.correct].style.backgroundColor = '#dcfce7';
                 document.getElementById('feedback-text').innerText = "😭 沒關係，看這裡！\n" + q.msg;
+                if(!db[curSub].wrongs) db[curSub].wrongs = [];
+                if(!db[curSub].wrongs.find(w => w.q === q.q)) db[curSub].wrongs.push(q);
             }
             document.getElementById('feedback').classList.remove('hidden');
         }
@@ -266,7 +284,11 @@
             ['page-subjects', 'page-home', 'page-summary', 'page-test'].forEach(p => document.getElementById(p).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
-        function deleteUnit(i) { if(confirm("確定刪除？")) { masterDB[curSub].units.splice(i, 1); renderAdminUnits(); } }
+        function deleteUnit(i) { if(confirm("確定刪除？")) { db[curSub].units.splice(i, 1); renderAdminUnits(); } }
+        function startReview() {
+            if(!db[curSub].wrongs || db[curSub].wrongs.length === 0) return alert("秀彬: 現在沒有錯題喔！");
+            testList = [...db[curSub].wrongs]; curIdx = 0; updateQ(); showPage('page-test');
+        }
     </script>
 </body>
 </html>
