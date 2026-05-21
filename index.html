@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 閃耀秀彬教練 V24 (Meta Pro)</title>
+    <title>✨ 閃耀秀彬教練 V25 (Meta Pro)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -141,20 +141,18 @@
             <button onclick="showPage('page-home')" class="w-full text-gray-400 text-sm underline mt-2">返回單元列表</button>
         </section>
 
-        <!-- 第三階段：考古題試卷選擇清單 (추가됨) -->
+        <!-- 第三階段：考古題試卷選擇清單 -->
         <section id="page-exam-list" class="hidden space-y-4">
             <button onclick="showPage('page-home')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回單元列表</button>
             <div class="glass p-6">
                 <div class="text-xs font-bold text-purple-500 uppercase tracking-wider mb-1">第三階段：歷屆考古題</div>
                 <h2 class="text-lg font-bold mb-4 text-purple-700 border-b pb-2">🎯 請選擇欲挑戰的歷屆試卷</h2>
-                <div id="student-exam-papers-container" class="space-y-3">
-                    <!-- 엄마가 수동입력한 출판사-학교명 리스트가 카드로 출력됨 -->
-                </div>
+                <div id="student-exam-papers-container" class="space-y-3"></div>
             </div>
             <button onclick="showPage('page-home')" class="w-full py-3 bg-gray-100 text-gray-500 font-bold rounded-xl text-sm border hover:bg-gray-200 transition-all">暫時不想做，返回首頁</button>
         </section>
 
-        <!-- 核心測驗引擎 (자가진단 & 기출문제 공용) -->
+        <!-- 核心測驗引擎 -->
         <section id="page-test" class="hidden">
             <div id="unit-test-img-container" class="mb-4"></div>
             <div class="mb-4 text-xs flex justify-between items-center">
@@ -174,10 +172,10 @@
             <button onclick="if(confirm('確定要跳過這個測驗，回到單元首頁嗎？')) showPage('page-home')" class="w-full mt-4 text-center text-xs text-gray-400 underline">跳過此階段，返回單元首頁</button>
         </section>
 
-        <!-- 智慧後台 (V24) -->
+        <!-- 智慧後台 (V25 改版) -->
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-[300] p-6 overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V24)</h2>
+                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V25)</h2>
                 <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
             </div>
             
@@ -243,33 +241,53 @@
 
                     <!-- 單元精密編輯區 -->
                     <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4">
-                        <h3 class="font-bold text-gray-700">編輯單元: <span id="editing-unit-name" class="text-pink-500"></span></h3>
+                        <h3 class="font-bold text-gray-700 border-b pb-2">編輯單元: <span id="editing-unit-name" class="text-pink-500"></span></h3>
                         <input type="text" id="admin-unit-img-url" class="w-full p-2 text-xs border rounded" placeholder="單元 圖片網址 (Vercel)">
                         
                         <div>
-                            <label class="block text-xs font-bold text-pink-600 mb-1">📝 第一階段：觀念重點整理 (純文字)</label>
+                            <label class="block text-xs font-bold text-pink-600 mb-1">1️⃣ 第一階段：觀念重點整理 (純文字)</label>
                             <textarea id="admin-summary" class="w-full h-32 p-3 text-xs border rounded" placeholder="請輸入重點內容..."></textarea>
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold text-blue-600 mb-1">🎯 第二階段：自我診斷測試題 (JSON Array)</label>
+                            <label class="block text-xs font-bold text-blue-600 mb-1">2️⃣ 第二階段：自我診斷測試題 (JSON Array)</label>
                             <textarea id="admin-questions" class="w-full h-32 p-3 text-xs border rounded font-mono" placeholder="[{'q': '題目', 'a':['選項1','選項2'], 'correct':0, 'msg':'解析'}]"></textarea>
                         </div>
 
-                        <!-- 다중 기출문제 등록 수동입력 확장 스페이스 (수정됨) -->
-                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-200 space-y-3">
-                            <label class="block text-xs font-bold text-purple-700">🔥 第三階段：歷屆考古題多套試卷管理 (JSON Array)</label>
-                            <p class="text-[10px] text-purple-500 leading-relaxed">您可以自由手動輸入「出版社」與「學校名稱」，並放入對應的題目題目陣列。</p>
-                            <textarea id="admin-exam-questions" class="w-full h-48 p-3 text-xs border rounded font-mono" placeholder="[
-  {
-    'publisher': '翰林',
-    'schoolName': '景美國中',
-    'questions': [{'q': '題目1', 'a': ['A', 'B'], 'correct': 0, 'msg': '解析1'}]
-  }
-]"></textarea>
+                        <!-- 🌟 개편된 다중 기출문제 리스트 UI 관리 스페이스 🌟 -->
+                        <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 space-y-4">
+                            <label class="block text-sm font-bold text-purple-700">3️⃣ 第三階段：歷屆考古題試卷清單</label>
+                            
+                            <!-- 추가된 시험지 리스트가 뜨는 곳 -->
+                            <div id="admin-papers-list-container" class="space-y-2"></div>
+                            
+                            <!-- 개별 시험지 세부 입력 항목 (평소엔 숨김, 추가/수정 누르면 나타남) -->
+                            <div id="admin-paper-detail-box" class="hidden bg-white p-4 rounded-lg border-2 border-purple-300 space-y-3">
+                                <h4 class="font-bold text-xs text-purple-600"><span id="paper-editor-mode-title">新增/編輯</span> 試卷資訊</h4>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-[10px] text-gray-400">出版社 (例如: 翰林)</label>
+                                        <input type="text" id="input-paper-publisher" class="w-full p-2 text-xs border rounded">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-gray-400">學校名稱 (例如: 景美國中)</label>
+                                        <input type="text" id="input-paper-school" class="w-full p-2 text-xs border rounded">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] text-purple-600 font-bold">題目與答案 JSON 貼上區</label>
+                                    <textarea id="input-paper-json" class="w-full h-40 p-2 text-xs border rounded font-mono" placeholder="[{'q':'題目', 'a':['A','B'], 'correct':0, 'msg':'解析'}]"></textarea>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="savePaperDraft()" class="flex-1 py-2 bg-purple-600 text-white font-bold text-xs rounded shadow">儲存此試卷</button>
+                                    <button onclick="document.getElementById('admin-paper-detail-box').classList.add('hidden')" class="py-2 px-3 bg-gray-200 text-gray-600 text-xs rounded">取消</button>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openNewPaperForm()" class="w-full py-2 bg-white border-2 border-dashed border-purple-300 text-purple-500 font-bold text-xs rounded-lg hover:bg-purple-100 transition-colors">+ 新增一組考古題試卷</button>
                         </div>
 
-                        <button onclick="applyUnitEdit()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl shadow">確認暫存</button>
+                        <button onclick="applyUnitEdit()" class="w-full py-4 bg-pink-500 text-white font-bold rounded-xl shadow-lg text-sm">確認此單元全部暫存</button>
                     </div>
                 </div>
 
@@ -295,6 +313,9 @@
         let testList = [], curIdx = 0, score = 0, currentRunningMode = 'normal'; 
         let selectedPaperInfo = { publisher: '', schoolName: '' };
         let adGrade = '', adSub = '', adSem = '', adExam = '';
+        
+        let tempExamPapers = []; // 현재 편집 중인 단원의 기출문제 임시 보관 배열
+        let currentEditingPaperIdx = -1;
 
         async function loadFromCloud() {
             try {
@@ -454,7 +475,11 @@
             showPage('page-summary');
         }
 
-        // 다중 기출문제 선택 리스트 화면 빌더 (추가됨)
+        function closeResult() {
+            document.getElementById('result-overlay').classList.add('hidden');
+            showPage('page-home');
+        }
+
         function goMetaStep3List() {
             document.getElementById('result-overlay').classList.add('hidden');
             const u = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam].units[curUnitIdx];
@@ -471,7 +496,7 @@
 
             papers.forEach((paper, pIdx) => {
                 const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-4 bg-purple-50 border border-purple-200 rounded-xl shadow-sm";
+                div.className = "flex justify-between items-center p-4 bg-purple-50 border border-purple-200 rounded-xl shadow-sm animate-fade-in";
                 div.innerHTML = `
                     <div>
                         <span class="bg-purple-200 text-purple-700 px-2 py-0.5 rounded text-[10px] font-bold mr-1">${paper.publisher || '自由'}</span>
@@ -486,7 +511,6 @@
             showPage('page-exam-list');
         }
 
-        // 특정 선택 기출문제 구동 엔진 (추가됨)
         function startExamPaperEngine(pIdx) {
             currentRunningMode = 'exam';
             const u = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam].units[curUnitIdx];
@@ -501,7 +525,6 @@
                 return;
             }
 
-            // 기출문제 및 보기 셔플 연산
             testList = originalQs.map(q => {
                 let options = q.a.map((text, idx) => ({ text, isCorrect: idx === q.correct }));
                 options.sort(() => Math.random() - 0.5);
@@ -546,7 +569,7 @@
             } else {
                 badge.innerText = "🔥 第三階段：歷屆考古題實戰";
                 badge.className = "px-2 py-0.5 rounded-full font-bold text-[10px] bg-purple-100 text-purple-700";
-                headerTag.innerText = `현재 도전 중인 시험지: [${selectedPaperInfo.publisher} - ${selectedPaperInfo.schoolName}]`;
+                headerTag.innerText = `目前挑戰：[${selectedPaperInfo.publisher} - ${selectedPaperInfo.schoolName}]`;
                 headerTag.classList.remove('hidden');
             }
 
@@ -578,7 +601,6 @@
                 btns[q.correct].style.backgroundColor = '#dcfce7';
                 document.getElementById('feedback-text').innerText = "😭 哎呀！答錯了。\n" + q.msg;
                 
-                // 오답노트 분기 가드 레이어
                 let wrongItem = {
                     q: q.q,
                     msg: q.msg,
@@ -666,7 +688,7 @@
             window.scrollTo(0,0);
         }
 
-        // ================= 后台脚本系统 =================
+        // ================= 后台管理 脚本系统 =================
         function checkPassword() {
             const p = prompt("請輸入後台管理密碼:");
             if (p === ADMIN_PASS) toggleAdmin();
@@ -754,6 +776,14 @@
             }
         }
 
+        function deleteUnit(i) {
+            if(confirm("確定要刪除此單元嗎？")) {
+                db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units.splice(i, 1);
+                renderAdminUnits(); document.getElementById('edit-area').classList.add('hidden');
+            }
+        }
+
+        // ================= 🌟 V25 핵심 개편: 기출문제 수동 관리 로직 🌟 =================
         function openEdit(i) {
             curUnitIdx = i;
             const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[i];
@@ -761,27 +791,121 @@
             document.getElementById('admin-unit-img-url').value = u.unitImg || '';
             document.getElementById('admin-summary').value = u.summary || '';
             document.getElementById('admin-questions').value = JSON.stringify(u.questions || [], null, 2);
-            document.getElementById('admin-exam-questions').value = JSON.stringify(u.examPapers || [], null, 2);
+            
+            // 기출문제 유실 방지 복사본 생성 및 동기화
+            tempExamPapers = JSON.parse(JSON.stringify(u.examPapers || []));
+            
+            document.getElementById('admin-paper-detail-box').classList.add('hidden');
+            renderAdminPapersList();
             document.getElementById('edit-area').classList.remove('hidden');
         }
 
+        // 단원별 시험지 리스트 갱신 UI
+        function renderAdminPapersList() {
+            const container = document.getElementById('admin-papers-list-container');
+            container.innerHTML = '';
+            
+            if(tempExamPapers.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-2">目前沒有考古題試卷，請點擊下方按鈕新增。</p>`;
+                return;
+            }
+            
+            tempExamPapers.forEach((paper, pIdx) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-2.5 bg-white border border-purple-200 rounded-lg text-xs shadow-sm";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-purple-600 font-mono">[${paper.publisher || '自由'}]</span> 
+                        <span class="font-bold text-gray-700">${paper.schoolName || '未命名試卷'}</span>
+                        <span class="text-gray-400 text-[10px] ml-1">(${paper.questions?.length || 0} 題)</span>
+                    </div>
+                    <div class="space-x-2">
+                        <button onclick="openEditPaperForm(${pIdx})" class="text-blue-500 font-bold">修改</button>
+                        <button onclick="deletePaperDraft(${pIdx})" class="text-red-400 font-bold">刪除</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 새 시험지 추가 폼 열기
+        function openNewPaperForm() {
+            currentEditingPaperIdx = -1;
+            document.getElementById('paper-editor-mode-title').innerText = "✨ 新增";
+            document.getElementById('input-paper-publisher').value = "";
+            document.getElementById('input-paper-school').value = "";
+            document.getElementById('input-paper-json').value = "[\n  {\n    \"q\": \"請輸入題目內容\",\n    \"a\": [\"選項1\", \"選項2\", \"選項3\", \"選項4\"],\n    \"correct\": 0,\n    \"msg\": \"請輸入解析說明\"\n  }\n]";
+            document.getElementById('admin-paper-detail-box').classList.remove('hidden');
+            document.getElementById('input-paper-publisher').focus();
+        }
+
+        // 기존 시험지 수정 폼 열기
+        function openEditPaperForm(pIdx) {
+            currentEditingPaperIdx = pIdx;
+            const paper = tempExamPapers[pIdx];
+            document.getElementById('paper-editor-mode-title').innerText = "✏️ 編輯";
+            document.getElementById('input-paper-publisher').value = paper.publisher || "";
+            document.getElementById('input-paper-school').value = paper.schoolName || "";
+            document.getElementById('input-paper-json').value = JSON.stringify(paper.questions || [], null, 2);
+            document.getElementById('admin-paper-detail-box').classList.remove('hidden');
+        }
+
+        // 개별 시험지 임시 묶음에 임시저장
+        function savePaperDraft() {
+            const pub = document.getElementById('input-paper-publisher').value.trim();
+            const sch = document.getElementById('input-paper-school').value.trim();
+            const jsonStr = document.getElementById('input-paper-json').value.trim();
+            
+            if(!pub || !sch) {
+                alert("請填寫 出版社 與 學校名稱！");
+                return;
+            }
+            
+            let parsedQs = [];
+            try {
+                parsedQs = JSON.parse(jsonStr);
+                if(!Array.isArray(parsedQs)) throw new Error();
+            } catch(e) {
+                alert("❌ 題目 JSON 語法格式錯誤！請檢查括號與逗號是否正確。");
+                return;
+            }
+            
+            const paperObj = { publisher: pub, schoolName: sch, questions: parsedQs };
+            
+            if(currentEditingPaperIdx === -1) {
+                tempExamPapers.push(paperObj);
+            } else {
+                tempExamPapers[currentEditingPaperIdx] = paperObj;
+            }
+            
+            document.getElementById('admin-paper-detail-box').classList.add('hidden');
+            renderAdminPapersList();
+        }
+
+        // 개별 시험지 임시 삭제
+        function deletePaperDraft(pIdx) {
+            if(confirm("確定要刪除這份試卷嗎？")) {
+                tempExamPapers.splice(pIdx, 1);
+                document.getElementById('admin-paper-detail-box').classList.add('hidden');
+                renderAdminPapersList();
+            }
+        }
+
+        // 단원 전체 임시저장 (임시 시험지 묶음을 진짜 db에 반영)
         function applyUnitEdit() {
             try {
                 const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[curUnitIdx];
                 u.unitImg = document.getElementById('admin-unit-img-url').value.trim();
                 u.summary = document.getElementById('admin-summary').value;
                 u.questions = JSON.parse(document.getElementById('admin-questions').value);
-                u.examPapers = JSON.parse(document.getElementById('admin-exam-questions').value); 
                 
-                alert("暫存成功！"); document.getElementById('edit-area').classList.add('hidden'); renderAdminUnits();
-            } catch(e) { alert("JSON 語法格式錯誤，請確認括號與逗號！"); }
-        }
-
-        function deleteUnit(i) {
-            if(confirm("確定要刪除此單元嗎？")) {
-                db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units.splice(i, 1);
-                renderAdminUnits(); document.getElementById('edit-area').classList.add('hidden');
-            }
+                // 수동으로 주입 및 편집한 시험지 묶음 데이터 반영
+                u.examPapers = tempExamPapers; 
+                
+                alert("🎯 該單元資料已成功「暫存」！請記得點擊最下方的黑色按鈕同步到雲端喔！"); 
+                document.getElementById('edit-area').classList.add('hidden'); 
+                renderAdminUnits();
+            } catch(e) { alert("自我診斷 題目 JSON 格式錯誤！"); }
         }
 
         async function saveToCloud() {
