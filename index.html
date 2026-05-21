@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 수제비 선생님 陪伴瑄 V26 </title>
+    <title>✨ 수제비 선생님 V27</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -31,7 +31,7 @@
 </head>
 <body onload="loadFromCloud()">
     
-    <!-- 導覽列 (상단 레이아웃 유지하며 홈버튼 추가) -->
+    <!-- 導覽列 -->
     <nav class="p-4 flex justify-between items-center max-w-md mx-auto">
         <h1 class="text-xl font-bold text-pink-500 flex items-center gap-2" onclick="goHomeFirstPage()" style="cursor:pointer">
             ✨ 수제비 선생님
@@ -41,7 +41,7 @@
                 <i class="fa-solid fa-star text-yellow-500 animate-pulse"></i>
                 <span id="nav-stars">0</span>
             </div>
-            <!-- 홈으로 가기 집 모양 버튼 추가 -->
+            <!-- 🏠 상단 홈으로 가기 버튼 -->
             <button onclick="goHomeFirstPage()" class="text-pink-400 p-1 hover:text-pink-600 transition-colors" title="回到首頁">
                 <i class="fa-solid fa-house text-2xl"></i>
             </button>
@@ -179,7 +179,7 @@
         <!-- 智慧後台 -->
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-[300] p-6 overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V26)</h2>
+                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V27)</h2>
                 <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
             </div>
             
@@ -201,7 +201,7 @@
 
                 <!-- 階層架構選擇器 -->
                 <div class="border p-4 rounded-xl bg-gray-50 space-y-4">
-                    <h3 class="text-sm font-bold text-pink-600 border-b pb-2">🎯 請依序選擇欲配置 the 範圍</h3>
+                    <h3 class="text-sm font-bold text-pink-600 border-b pb-2">🎯 請依序選擇欲配置的範圍</h3>
                     <div>
                         <p class="text-xs font-bold text-gray-500 mb-1">1. 選擇年級</p>
                         <div class="grid grid-cols-6 gap-1" id="admin-grade-select"></div>
@@ -229,6 +229,27 @@
 
                 <!-- 資料配置區 -->
                 <div id="admin-main-area" class="hidden space-y-6">
+                    <!-- 🚨 오답노트 강제 초기화 대시보드 (신규 추가) -->
+                    <div class="bg-red-50 p-4 rounded-xl border border-red-200 space-y-3">
+                        <h4 class="font-bold text-xs text-red-700 flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> 💡 該範圍 錯題本快速初始化管理
+                        </h4>
+                        <p class="text-[11px] text-gray-500 leading-relaxed">
+                            針對目前選定的 <span id="admin-reset-scope-text" class="font-bold text-red-600"></span> 範圍，您可以手動清空已累積的錯題紀錄。
+                        </p>
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <button onclick="resetSelectedScopeWrongs('normal')" class="bg-white border border-red-300 text-red-600 font-bold py-2 rounded-lg text-xs hover:bg-red-100 transition-colors">
+                                清空 診斷錯題本 (<span id="admin-cnt-normal-wrong">0</span>)
+                            </button>
+                            <button onclick="resetSelectedScopeWrongs('exam')" class="bg-white border border-purple-300 text-purple-600 font-bold py-2 rounded-lg text-xs hover:bg-purple-100 transition-colors">
+                                清空 考古題錯題本 (<span id="admin-cnt-exam-wrong">0</span>)
+                            </button>
+                        </div>
+                        <button onclick="resetSelectedScopeWrongs('all')" class="w-full bg-red-600 text-white font-bold py-2 rounded-lg text-xs hover:bg-red-700 shadow-sm transition-colors">
+                            💥 一鍵完全清空上述兩者錯題本
+                        </button>
+                    </div>
+
                     <div class="bg-blue-50 p-4 rounded-xl space-y-3">
                         <h4 class="font-bold text-xs text-blue-700">🖼️ 各層級 圖片網址配置</h4>
                         <div><p id="admin-label-grade-img" class="text-xs text-gray-500 mb-1"></p><input type="text" id="admin-input-grade-img" class="w-full p-2 text-xs border rounded"></div>
@@ -258,7 +279,7 @@
                             <textarea id="admin-questions" class="w-full h-32 p-3 text-xs border rounded font-mono" placeholder="[{'q': '題目', 'a':['選項1','選項2'], 'correct':0, 'msg':'解析'}]"></textarea>
                         </div>
 
-                        <!-- 3단계 역대 기출문제 입력 관리 구역 -->
+                        <!-- 3단계 역代 기출문제 입력 관리 구역 -->
                         <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 space-y-4">
                             <label class="block text-sm font-bold text-purple-700">3️⃣ 第三階段：歷屆考古題多套試卷管理</label>
                             
@@ -440,7 +461,6 @@
 
         function selectExam(ex) { curExam = ex; showHome(); }
 
-        // 홈 화면을 그려줄 때 실시간 오답 개수를 정확히 세어주는 로직
         function showHome() {
             document.getElementById('welcome-msg').innerText = `${curGrade}年級 ${curSub} - ${curSem} [${curExam}]`;
             const examObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
@@ -465,9 +485,7 @@
             showPage('page-home');
         }
 
-        // 🏠 언제든 첫 메인 화면(학년 선택)으로 안전하게 이동시켜 주는 내비게이션 함수
         function goHomeFirstPage() {
-            // 테스트 도중 나가는 경우 확인창을 띄워 이탈을 방지합니다.
             if(!document.getElementById('page-test').classList.contains('hidden')) {
                 if(!confirm('確定要結束目前的測驗並回到首頁嗎？')) return;
             }
@@ -752,6 +770,12 @@
             if(!adGrade || !adSub || !adSem || !adExam) { document.getElementById('admin-main-area').classList.add('hidden'); return; }
             document.getElementById('admin-main-area').classList.remove('hidden');
 
+            // 오답노트 범위 텍스트 및 개수 실시간 갱신
+            document.getElementById('admin-reset-scope-text').innerText = `${adGrade}年級 ${adSub} (${adSem} - ${adExam})`;
+            const examObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            document.getElementById('admin-cnt-normal-wrong').innerText = examObj.wrongs ? examObj.wrongs.length : 0;
+            document.getElementById('admin-cnt-exam-wrong').innerText = examObj.examWrongs ? examObj.examWrongs.length : 0;
+
             document.getElementById('admin-label-grade-img').innerText = `年級照片 (${adGrade}年級)`;
             document.getElementById('admin-label-sub-img').innerText = `科目照片 (${adSub})`;
             document.getElementById('admin-label-sem-img').innerText = `學期照片 (${adSem})`;
@@ -763,6 +787,29 @@
             document.getElementById('admin-input-exam-img').value = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg || '';
 
             renderAdminUnits();
+        }
+
+        // 🚨 오답노트 강제 초기화 함수 (신규 추가)
+        function resetSelectedScopeWrongs(type) {
+            if(!adGrade || !adSub || !adSem || !adExam) return;
+            const examObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            
+            let confirmMsg = "";
+            if(type === 'normal') confirmMsg = `確定要清空 [${adGrade}年級 ${adSub} - ${adExam}] 의 모든 '診斷錯題本(일반 오답)' 데이터를 초기화하시겠습니까?`;
+            else if(type === 'exam') confirmMsg = `確定要清空 [${adGrade}年級 ${adSub} - ${adExam}] 의 모든 '考古題錯題本(기출 오답)' 데이터를 초기화하시겠습니까?`;
+            else confirmMsg = `⚠️ 警告：確定要【一鍵完全清空】 [${adGrade}年級 ${adSub} - ${adExam}] 範圍內的所有錯題本(일반+기출 오답 전체) 데이터를 초기화하시겠습니까?`;
+
+            if(!confirm(confirmMsg)) return;
+
+            if(type === 'normal' || type === 'all') {
+                examObj.wrongs = [];
+            }
+            if(type === 'exam' || type === 'all') {
+                examObj.examWrongs = [];
+            }
+
+            alert("✨ 錯題暫時清空成功！請務必點擊最下方的「儲存並同步至雲端」按鈕以完成實時更新。");
+            updateAdminPanelFlow();
         }
 
         function renderAdminUnits() {
