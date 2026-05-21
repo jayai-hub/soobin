@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 閃耀秀彬教練 V25 (Meta Pro)</title>
+    <title>✨ 閃耀秀彬教練 V26</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=400;700&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdf2f8; color: #333; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.95); border-radius: 1.5rem; border: 1px solid rgba(255, 192, 203, 0.3); }
         .btn-primary { background: linear-gradient(45deg, #ff75c3, #ffad71); color: white; border:none; border-radius: 1rem; cursor: pointer; }
@@ -172,10 +172,10 @@
             <button onclick="if(confirm('確定要跳過這個測驗，回到單元首頁嗎？')) showPage('page-home')" class="w-full mt-4 text-center text-xs text-gray-400 underline">跳過此階段，返回單元首頁</button>
         </section>
 
-        <!-- 智慧後台 (V25 改版) -->
+        <!-- 智慧後台 -->
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-[300] p-6 overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V25)</h2>
+                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V26)</h2>
                 <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
             </div>
             
@@ -254,44 +254,43 @@
                             <textarea id="admin-questions" class="w-full h-32 p-3 text-xs border rounded font-mono" placeholder="[{'q': '題目', 'a':['選項1','選項2'], 'correct':0, 'msg':'解析'}]"></textarea>
                         </div>
 
-                        <!-- 🌟 개편된 다중 기출문제 리스트 UI 관리 스페이스 🌟 -->
+                        <!-- 🌟 V26 요청 반영: 수동 입력창 인터페이스 결합 존 🌟 -->
                         <div class="bg-purple-50 p-4 rounded-xl border border-purple-200 space-y-4">
-                            <label class="block text-sm font-bold text-purple-700">3️⃣ 第三階段：歷屆考古題試卷清單</label>
+                            <label class="block text-sm font-bold text-purple-700">3️⃣ 第三階段：歷屆考古題多套試卷管理</label>
                             
-                            <!-- 추가된 시험지 리스트가 뜨는 곳 -->
-                            <div id="admin-papers-list-container" class="space-y-2"></div>
-                            
-                            <!-- 개별 시험지 세부 입력 항목 (평소엔 숨김, 추가/수정 누르면 나타남) -->
-                            <div id="admin-paper-detail-box" class="hidden bg-white p-4 rounded-lg border-2 border-purple-300 space-y-3">
-                                <h4 class="font-bold text-xs text-purple-600"><span id="paper-editor-mode-title">新增/編輯</span> 試卷資訊</h4>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-[10px] text-gray-400">出版社 (例如: 翰林)</label>
-                                        <input type="text" id="input-paper-publisher" class="w-full p-2 text-xs border rounded">
-                                    </div>
-                                    <div>
-                                        <label class="block text-[10px] text-gray-400">學校名稱 (例如: 景美國中)</label>
-                                        <input type="text" id="input-paper-school" class="w-full p-2 text-xs border rounded">
-                                    </div>
+                            <!-- 1. 출판사 및 학교명 입력 폼 필드 (JSON 입력창 바로 윗부분 배치 완료) -->
+                            <div class="grid grid-cols-2 gap-3 bg-white p-3 rounded-lg border border-purple-100">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">出本社 (출판사)</label>
+                                    <input type="text" id="input-paper-publisher" class="w-full p-2 text-xs border rounded focus:ring-1 focus:ring-purple-400" placeholder="例: 翰林, 康軒">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] text-purple-600 font-bold">題目與答案 JSON 貼上區</label>
-                                    <textarea id="input-paper-json" class="w-full h-40 p-2 text-xs border rounded font-mono" placeholder="[{'q':'題目', 'a':['A','B'], 'correct':0, 'msg':'解析'}]"></textarea>
-                                </div>
-                                <div class="flex gap-2">
-                                    <button onclick="savePaperDraft()" class="flex-1 py-2 bg-purple-600 text-white font-bold text-xs rounded shadow">儲存此試卷</button>
-                                    <button onclick="document.getElementById('admin-paper-detail-box').classList.add('hidden')" class="py-2 px-3 bg-gray-200 text-gray-600 text-xs rounded">取消</button>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">學校名稱 (학교명)</label>
+                                    <input type="text" id="input-paper-school" class="w-full p-2 text-xs border rounded focus:ring-1 focus:ring-purple-400" placeholder="例: 景美國中">
                                 </div>
                             </div>
                             
-                            <button onclick="openNewPaperForm()" class="w-full py-2 bg-white border-2 border-dashed border-purple-300 text-purple-500 font-bold text-xs rounded-lg hover:bg-purple-100 transition-colors">+ 新增一組考古題試卷</button>
+                            <!-- 2. 기출문제 알맹이만 복붙하는 JSON 상자 -->
+                            <div>
+                                <label class="block text-xs font-bold text-purple-600 mb-1">歷屆考古題 JSON Array (기출문제 내용)</label>
+                                <textarea id="input-paper-json" class="w-full h-44 p-2 text-xs border rounded font-mono bg-gray-50 focus:bg-white" placeholder="[{'q':'題目', 'a':['A','B'], 'correct':0, 'msg':'解析'}]"></textarea>
+                                <p class="text-[10px] text-gray-400 mt-1">※ 여기에는 문제 배열만 깔끔하게 복붙해 주시면 됩니다.</p>
+                            </div>
+
+                            <!-- 임시저장 내역 로그 확인 배시보드 -->
+                            <div id="admin-papers-list-container" class="space-y-1 mt-2"></div>
+                            
+                            <div class="flex gap-2">
+                                <button onclick="savePaperDraft()" class="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-lg shadow-sm">➕ 載入並新增此試卷</button>
+                                <button onclick="clearPaperForm()" class="py-2 px-3 bg-gray-200 text-gray-600 text-xs rounded-lg">清空重填</button>
+                            </div>
                         </div>
 
-                        <button onclick="applyUnitEdit()" class="w-full py-4 bg-pink-500 text-white font-bold rounded-xl shadow-lg text-sm">確認此單元全部暫存</button>
+                        <button onclick="applyUnitEdit()" class="w-full py-4 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg text-sm transition-colors">確認此單元全部暫存</button>
                     </div>
                 </div>
 
-                <button id="final-save-btn" onclick="saveToCloud()" class="w-full py-5 bg-gray-800 text-white font-bold rounded-2xl shadow-xl text-lg mt-10">💾 儲存並同步至雲端</button>
+                <button id="final-save-btn" onclick="saveToCloud()" class="w-full py-5 bg-gray-800 hover:bg-black text-white font-bold rounded-2xl shadow-xl text-lg mt-10 transition-colors">💾 儲存並同步至雲端</button>
             </div>
         </section>
     </main>
@@ -314,8 +313,7 @@
         let selectedPaperInfo = { publisher: '', schoolName: '' };
         let adGrade = '', adSub = '', adSem = '', adExam = '';
         
-        let tempExamPapers = []; // 현재 편집 중인 단원의 기출문제 임시 보관 배열
-        let currentEditingPaperIdx = -1;
+        let tempExamPapers = []; 
 
         async function loadFromCloud() {
             try {
@@ -486,7 +484,7 @@
             const papers = u.examPapers || [];
 
             if(papers.length === 0) {
-                alert("✨ 太棒了！這個單元媽媽目前還沒有上傳歷屆考古題喔。\n讓我們先回主畫面進行其他單元的學習吧！🌱");
+                alert("✨ 這個單元媽媽目前還沒有上傳歷屆考古題喔。");
                 showPage('page-home');
                 return;
             }
@@ -496,7 +494,7 @@
 
             papers.forEach((paper, pIdx) => {
                 const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-4 bg-purple-50 border border-purple-200 rounded-xl shadow-sm animate-fade-in";
+                div.className = "flex justify-between items-center p-4 bg-purple-50 border border-purple-200 rounded-xl shadow-sm";
                 div.innerHTML = `
                     <div>
                         <span class="bg-purple-200 text-purple-700 px-2 py-0.5 rounded text-[10px] font-bold mr-1">${paper.publisher || '自由'}</span>
@@ -602,10 +600,7 @@
                 document.getElementById('feedback-text').innerText = "😭 哎呀！答錯了。\n" + q.msg;
                 
                 let wrongItem = {
-                    q: q.q,
-                    msg: q.msg,
-                    a: q.a,
-                    correct: q.correct,
+                    q: q.q, msg: q.msg, a: q.a, correct: q.correct,
                     metaTag: currentRunningMode === 'exam' ? `[${selectedPaperInfo.publisher}-${selectedPaperInfo.schoolName}]` : ''
                 };
 
@@ -636,18 +631,16 @@
                 db.stars = (db.stars || 0) + 1;
                 updateStarUI();
                 saveStarsOnly();
-                
                 perfectBadge.classList.remove('hidden');
                 starAlert.classList.remove('hidden');
-                
-                msg = "🎉 每一分耕耘都有最耀眼的收穫！\n看到你今天這麼認真複習、專注耐心地作答，秀彬教練真的為你感到無比驕傲！🐰❤️";
+                msg = "🎉 每一分耕耘都有最耀眼的收穫！\n秀彬教練真的為你感到無比驕傲！🐰❤️";
                 confetti({ particleCount: 150, spread: 75, origin: { y: 0.6 } });
             } else {
                 perfectBadge.classList.add('hidden');
                 starAlert.classList.add('hidden');
                 if(finalScore >= 80) msg = "👏 非常優秀！離滿分只差一點點了！再接再厲！";
                 else if(finalScore >= 50) msg = "💪 不錯喔！誠實地面對錯題、吸取養分，前進！";
-                else msg = "🌱 沒關係，努力的過程遠比分數更具價值！跟著秀彬教練多複習幾次吧！";
+                else msg = "🌱 跟著秀彬教練多複習幾次吧！";
             }
 
             if(currentRunningMode === 'normal') {
@@ -688,7 +681,7 @@
             window.scrollTo(0,0);
         }
 
-        // ================= 后台管理 脚本系统 =================
+        // ================= 後台管理系統 =================
         function checkPassword() {
             const p = prompt("請輸入後台管理密碼:");
             if (p === ADMIN_PASS) toggleAdmin();
@@ -783,7 +776,7 @@
             }
         }
 
-        // ================= 🌟 V25 핵심 개편: 기출문제 수동 관리 로직 🌟 =================
+        // ================= 🌟 V26 신규 장착: 출판사/학교명 텍스트 자동 결합 제어 🚀 =================
         function openEdit(i) {
             curUnitIdx = i;
             const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[i];
@@ -792,72 +785,53 @@
             document.getElementById('admin-summary').value = u.summary || '';
             document.getElementById('admin-questions').value = JSON.stringify(u.questions || [], null, 2);
             
-            // 기출문제 유실 방지 복사본 생성 및 동기화
             tempExamPapers = JSON.parse(JSON.stringify(u.examPapers || []));
-            
-            document.getElementById('admin-paper-detail-box').classList.add('hidden');
+            clearPaperForm();
             renderAdminPapersList();
             document.getElementById('edit-area').classList.remove('hidden');
         }
 
-        // 단원별 시험지 리스트 갱신 UI
         function renderAdminPapersList() {
             const container = document.getElementById('admin-papers-list-container');
             container.innerHTML = '';
             
             if(tempExamPapers.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-2">目前沒有考古題試卷，請點擊下方按鈕新增。</p>`;
+                container.innerHTML = `<p class="text-[11px] text-gray-400 text-center py-2">目前此單元尚無歷屆試卷，請在上方輸入後點擊新增。</p>`;
                 return;
             }
             
             tempExamPapers.forEach((paper, pIdx) => {
                 const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-2.5 bg-white border border-purple-200 rounded-lg text-xs shadow-sm";
+                div.className = "flex justify-between items-center p-2 bg-purple-100/50 border border-purple-200 rounded-lg text-xs mb-1 shadow-sm";
                 div.innerHTML = `
                     <div>
-                        <span class="font-bold text-purple-600 font-mono">[${paper.publisher || '自由'}]</span> 
+                        <span class="font-bold text-purple-700 font-mono">[${paper.publisher || '自由'}]</span> 
                         <span class="font-bold text-gray-700">${paper.schoolName || '未命名試卷'}</span>
                         <span class="text-gray-400 text-[10px] ml-1">(${paper.questions?.length || 0} 題)</span>
                     </div>
-                    <div class="space-x-2">
-                        <button onclick="openEditPaperForm(${pIdx})" class="text-blue-500 font-bold">修改</button>
-                        <button onclick="deletePaperDraft(${pIdx})" class="text-red-400 font-bold">刪除</button>
-                    </div>
+                    <button onclick="deletePaperDraft(${pIdx})" class="text-red-500 font-bold text-[11px] hover:underline">刪除</button>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // 새 시험지 추가 폼 열기
-        function openNewPaperForm() {
-            currentEditingPaperIdx = -1;
-            document.getElementById('paper-editor-mode-title').innerText = "✨ 新增";
+        function clearPaperForm() {
             document.getElementById('input-paper-publisher').value = "";
             document.getElementById('input-paper-school').value = "";
-            document.getElementById('input-paper-json').value = "[\n  {\n    \"q\": \"請輸入題目內容\",\n    \"a\": [\"選項1\", \"選項2\", \"選項3\", \"選項4\"],\n    \"correct\": 0,\n    \"msg\": \"請輸入解析說明\"\n  }\n]";
-            document.getElementById('admin-paper-detail-box').classList.remove('hidden');
-            document.getElementById('input-paper-publisher').focus();
+            document.getElementById('input-paper-json').value = "";
         }
 
-        // 기존 시험지 수정 폼 열기
-        function openEditPaperForm(pIdx) {
-            currentEditingPaperIdx = pIdx;
-            const paper = tempExamPapers[pIdx];
-            document.getElementById('paper-editor-mode-title').innerText = "✏️ 編輯";
-            document.getElementById('input-paper-publisher').value = paper.publisher || "";
-            document.getElementById('input-paper-school').value = paper.schoolName || "";
-            document.getElementById('input-paper-json').value = JSON.stringify(paper.questions || [], null, 2);
-            document.getElementById('admin-paper-detail-box').classList.remove('hidden');
-        }
-
-        // 개별 시험지 임시 묶음에 임시저장
         function savePaperDraft() {
             const pub = document.getElementById('input-paper-publisher').value.trim();
             const sch = document.getElementById('input-paper-school').value.trim();
             const jsonStr = document.getElementById('input-paper-json').value.trim();
             
             if(!pub || !sch) {
-                alert("請填寫 出版社 與 學校名稱！");
+                alert("❌ 請務必填寫「出本社」與「學校名稱」！");
+                return;
+            }
+            if(!jsonStr) {
+                alert("❌ 請貼入考古題題目 JSON Array！");
                 return;
             }
             
@@ -866,32 +840,25 @@
                 parsedQs = JSON.parse(jsonStr);
                 if(!Array.isArray(parsedQs)) throw new Error();
             } catch(e) {
-                alert("❌ 題目 JSON 語法格式錯誤！請檢查括號與逗號是否正確。");
+                alert("❌ 題目 JSON 語法格式錯誤！請檢查 [ ] 括號或逗號是否漏掉。");
                 return;
             }
             
             const paperObj = { publisher: pub, schoolName: sch, questions: parsedQs };
+            tempExamPapers.push(paperObj);
             
-            if(currentEditingPaperIdx === -1) {
-                tempExamPapers.push(paperObj);
-            } else {
-                tempExamPapers[currentEditingPaperIdx] = paperObj;
-            }
-            
-            document.getElementById('admin-paper-detail-box').classList.add('hidden');
+            clearPaperForm();
             renderAdminPapersList();
+            alert("✨ 試卷成功加載至緩衝清單！");
         }
 
-        // 개별 시험지 임시 삭제
         function deletePaperDraft(pIdx) {
-            if(confirm("確定要刪除這份試卷嗎？")) {
+            if(confirm("確定要刪除這份試卷緩衝嗎？")) {
                 tempExamPapers.splice(pIdx, 1);
-                document.getElementById('admin-paper-detail-box').classList.add('hidden');
                 renderAdminPapersList();
             }
         }
 
-        // 단원 전체 임시저장 (임시 시험지 묶음을 진짜 db에 반영)
         function applyUnitEdit() {
             try {
                 const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[curUnitIdx];
@@ -899,17 +866,16 @@
                 u.summary = document.getElementById('admin-summary').value;
                 u.questions = JSON.parse(document.getElementById('admin-questions').value);
                 
-                // 수동으로 주입 및 편집한 시험지 묶음 데이터 반영
                 u.examPapers = tempExamPapers; 
                 
-                alert("🎯 該單元資料已成功「暫存」！請記得點擊最下方的黑色按鈕同步到雲端喔！"); 
+                alert("🎯 該單元配置已成功暫存！請滑動到最下方點擊「黑色雲端儲存鈕」完成最终同步！"); 
                 document.getElementById('edit-area').classList.add('hidden'); 
                 renderAdminUnits();
             } catch(e) { alert("自我診斷 題目 JSON 格式錯誤！"); }
         }
 
         async function saveToCloud() {
-            const btn = document.getElementById('final-save-btn'); btn.innerText = "⏳ 儲存同步中...";
+            const btn = document.getElementById('final-save-btn'); btn.innerText = "⏳ 雲端同步中，請稍候...";
             try {
                 db.appMainImg = document.getElementById('admin-app-img-url').value.trim();
                 db.stars = parseInt(document.getElementById('admin-stars-count').value) || 0;
@@ -923,7 +889,7 @@
                 }
 
                 await fetch(API_URL, { method: 'PUT', headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY }, body: JSON.stringify(db) });
-                alert("✅ 雲端儲存成功！"); location.reload();
+                alert("✅ 雲端資料同步更新成功！頁面將自動重載。"); location.reload();
             } catch (e) { alert("❌ 雲端儲存失敗"); btn.innerText = "💾 儲存並同步至雲端"; }
         }
     </script>
