@@ -3,108 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 閃耀秀彬教練 V28.1 (최적화 풀버전)</title>
+    <title>閃耀秀彬教練 V28.2 (Full Version)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdf2f8; }
-        .glass { background: rgba(255, 255, 255, 0.95); border-radius: 1rem; border: 1px solid #fbcfe8; }
-        .hidden { display: none !important; }
-        .btn-primary { background: #ec4899; color: white; padding: 1rem; border-radius: 0.75rem; font-weight: bold; }
-        .grid-btn { background: white; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 1rem; font-weight: bold; }
     </style>
 </head>
-<body onload="loadFromCloud()">
+<body onload="init()">
 
-    <div id="loading" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50">
-        <div class="text-pink-500 font-bold text-xl">資料載入中...</div>
+    <div id="app" class="max-w-2xl mx-auto p-4">
+        <h1 class="text-2xl font-bold text-center mb-6 text-pink-600">閃耀秀彬教練</h1>
+        <div id="content" class="space-y-4"></div>
+        
+        <!-- 디버깅 영역: 내용이 안 보일 때 확인용 -->
+        <div id="debug-info" class="mt-10 p-4 bg-gray-100 text-xs text-gray-500 rounded hidden"></div>
+        
+        <button onclick="checkAdmin()" class="mt-10 w-full text-gray-300 text-xs">관리자 로그인</button>
     </div>
-
-    <main class="max-w-2xl mx-auto p-4">
-        <!-- 메인 페이지 -->
-        <section id="page-home" class="hidden">
-            <h1 class="text-2xl font-bold text-pink-600 text-center mb-6">✨ 閃耀秀彬教練</h1>
-            <div id="exam-papers-container" class="space-y-3"></div>
-            <button onclick="checkPassword()" class="mt-8 w-full p-2 text-gray-300 text-xs text-center">後台管理</button>
-        </section>
-
-        <!-- 관리자 모달 -->
-        <section id="page-admin" class="hidden fixed inset-0 bg-white z-[100] p-6 overflow-y-auto">
-            <h2 class="text-xl font-bold mb-4">🐰 後台 (V28.1)</h2>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold">考古題 JSON</label>
-                    <textarea id="input-paper-json" class="w-full h-40 p-2 border rounded-lg font-mono text-xs"></textarea>
-                </div>
-                <button onclick="saveToCloud()" class="w-full py-4 bg-black text-white font-bold rounded-xl">💾 저장 및 클라우드 동기화</button>
-                <button onclick="document.getElementById('page-admin').classList.add('hidden')" class="w-full py-2 text-gray-500">닫기</button>
-            </div>
-        </section>
-    </main>
 
     <script>
         const BIN_ID = "6a005e56adc21f119a7c1f86";
         const MASTER_KEY = "$2a$10$0IMIZdF3/BKscfzxvO6MuepHI4f3d2VXiIus8mfSCo1FIPXoZVFQ.";
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
         
-        let db = { grades: { "7": { subjects: { "自然": { semesters: { "上學期": { exams: { "第一段考": { examPapers: [] } } } } } } } } };
+        let db = null;
 
-        async function loadFromCloud() {
+        async function init() {
             try {
                 const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY }, cache: 'no-store' });
                 const data = await res.json();
                 db = data.record;
-                renderHome();
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('page-home').classList.remove('hidden');
+                renderContent();
             } catch (e) {
-                alert("로드 실패: 새로고침 해주세요.");
+                document.getElementById('content').innerHTML = "서버 연결 실패. 인터넷을 확인하세요.";
             }
         }
 
-        function renderHome() {
-            // 현재 타겟 경로 (7학년 자연 상학기 1단과 기준)
-            const eObj = db.grades["7"].subjects["自然"].semesters["上學期"].exams["第一段考"];
-            const cont = document.getElementById('exam-papers-container');
-            cont.innerHTML = '';
+        function renderContent() {
+            const cont = document.getElementById('content');
+            const debug = document.getElementById('debug-info');
             
-            if (eObj.examPapers && eObj.examPapers.length > 0) {
-                eObj.examPapers.forEach(p => {
-                    const div = document.createElement('div');
-                    div.className = "p-4 bg-purple-50 rounded-xl border border-purple-100 font-bold text-purple-800";
-                    div.innerHTML = `${p.school} (${p.questions.length}題)`;
-                    cont.appendChild(div);
-                });
-            } else {
-                cont.innerHTML = '<p class="text-center text-gray-400">데이터가 없습니다.</p>';
+            // 데이터 경로 탐색 (이 부분이 실제 저장된 경로와 일치해야 합니다)
+            try {
+                // 1. 전체 구조가 정상인지 체크
+                if (!db || !db.grades) {
+                    debug.classList.remove('hidden');
+                    debug.innerText = "데이터가 비어있거나 구조가 잘못되었습니다.";
+                    return;
+                }
+
+                // 2. 현재 선택된 경로 데이터 추출 (수정 가능)
+                const currentData = db.grades["7"]?.subjects["自然"]?.semesters["上學期"]?.exams["第一段考"]?.examPapers;
+
+                if (!currentData || currentData.length === 0) {
+                    cont.innerHTML = '<p class="text-center text-gray-400">尚無考古題資料</p>';
+                    debug.classList.remove('hidden');
+                    debug.innerText = "디버깅: 데이터 경로에 접근했으나 examPapers가 비어있습니다.";
+                } else {
+                    currentData.forEach((p, idx) => {
+                        const btn = document.createElement('div');
+                        btn.className = "p-4 bg-white rounded-xl shadow border border-pink-100 font-bold";
+                        btn.innerHTML = `${p.school || '시험지'} - ${p.questions?.length || 0}문제`;
+                        cont.appendChild(btn);
+                    });
+                }
+            } catch (e) {
+                debug.classList.remove('hidden');
+                debug.innerText = "에러 발생: " + e.message;
             }
         }
 
-        async function saveToCloud() {
+        function checkAdmin() {
+            if(prompt("비밀번호") === "1234") {
+                const json = prompt("JSON 데이터 입력");
+                if(json) saveToCloud(json);
+            }
+        }
+
+        async function saveToCloud(jsonStr) {
             try {
-                const jsonStr = document.getElementById('input-paper-json').value;
-                const eObj = db.grades["7"].subjects["自然"].semesters["上學期"].exams["第一段考"];
-                
-                // 데이터 업데이트
-                eObj.examPapers = JSON.parse(jsonStr.replace(/'/g, '"'));
+                const parsed = JSON.parse(jsonStr);
+                // 데이터를 특정 경로에 강제로 할당
+                db.grades["7"].subjects["自然"].semesters["上學期"].exams["第一段考"].examPapers = parsed;
                 
                 const res = await fetch(API_URL, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(db)
                 });
-                
-                if(res.ok) {
-                    alert("성공적으로 저장되었습니다! 🚀");
-                    location.reload();
-                }
-            } catch (e) {
-                alert("저장 실패: JSON 형식을 확인하세요.");
-            }
+                if(res.ok) { alert("저장 성공!"); location.reload(); }
+            } catch (e) { alert("JSON 형식 에러: " + e.message); }
         }
-
-        function checkPassword() { if(prompt("비밀번호:") === "1234") document.getElementById('page-admin').classList.remove('hidden'); }
     </script>
 </body>
 </html>
