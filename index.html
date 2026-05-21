@@ -3,251 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 수제비 선생님의 공부방 🌸</title>
-    
-    <!-- React 및 런타임 컴파일러 인젝션 -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>✨ 수제비 선생님 공부방 V28</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- 대만 학생들이 가장 선호하는 깔끔한 번체 폰트 로드 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #FFF5F7; /* 수빈 스타일의 상징: 연분홍 파스텔 배경 */
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdf2f8; color: #333; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.95); border-radius: 1.5rem; border: 1px solid rgba(255, 192, 203, 0.3); }
+        .btn-primary { background: linear-gradient(45deg, #ff75c3, #ffad71); color: white; border:none; border-radius: 1rem; cursor: pointer; }
+        .grid-btn { background: white; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; position: relative; z-index: 10; text-align: center; }
+        .grid-btn:hover { background-color: #fce7f3; transform: translateY(-2px); }
+        .summary-box { white-space: pre-wrap; line-height: 1.8; font-size: 1.05rem; }
+        .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 4px; font-weight: bold; color: #92400e; }
+        .fit-img { width: 100%; height: auto; max-height: 250px; object-fit: contain; background-color: #fff; border-radius: 1.5rem; margin-bottom: 1rem; pointer-events: none; }
+        .soobin-bubble { background: #fff; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; color: #db2777; font-weight: bold; text-align: center; }
+        .hidden { display: none !important; }
+        .result-card { position: fixed; inset: 0; background: rgba(255,255,255,0.97); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #ff75c3; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .admin-select-active { background-color: #fbcfe8 !important; border-color: #db2777 !important; font-weight: bold; }
     </style>
 </head>
-<body class="antialiased text-slate-700">
+<body onload="loadFromCloud()">
+    
+    <nav class="p-4 flex justify-between items-center max-w-4xl mx-auto">
+        <h1 class="text-xl font-bold text-pink-500 flex items-center gap-2" onclick="goHomeFirstPage()" style="cursor:pointer">
+            ✨ 수제비 선생님
+        </h1>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5 bg-yellow-100 text-amber-600 px-3 py-1 rounded-full font-bold text-sm border border-yellow-200 shadow-sm">
+                <i class="fa-solid fa-star text-yellow-500 animate-pulse"></i>
+                <span id="nav-stars">0</span>
+            </div>
+            <button onclick="goHomeFirstPage()" class="text-pink-400 p-1 hover:text-pink-600 transition-colors" title="回到首頁">
+                <i class="fa-solid fa-house text-2xl"></i>
+            </button>
+            <button onclick="checkPassword()" class="text-pink-300 p-1 hover:text-pink-500 transition-colors"><i class="fa-solid fa-gear text-2xl"></i></button>
+        </div>
+    </nav>
 
-    <!-- React 코드가 렌더링될 실제 루트 노드 -->
-    <div id="root"></div>
+    <div id="loading-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
+        <div class="animate-spin text-4xl text-pink-500 mb-4"><i class="fa-solid fa-circle-notch"></i></div>
+        <p class="text-pink-500 font-bold">同步中...</p>
+    </div>
 
-    <!-- 브라우저가 실시간으로 React를 해석할 수 있도록 text/babel 형식으로 작성 -->
-    <script type="text/babel">
-        const { useState } = React;
+    <div id="result-overlay" class="result-card hidden">
+        <h2 class="text-3xl font-bold text-pink-600 mb-2">測試結束！</h2>
+        <div class="relative my-4">
+            <div id="score-circle" class="text-7xl font-black text-gray-800 bg-pink-100 w-36 h-36 rounded-full flex items-center justify-center border-4 border-pink-400 shadow-inner font-mono">100</div>
+            <div id="perfect-badge" class="absolute -bottom-2 -right-2 bg-yellow-400 text-white p-2 rounded-full text-xs font-black shadow-lg hidden"><i class="fa-solid fa-trophy"></i> PERFECT!</div>
+        </div>
+        
+        <div id="star-gain-alert" class="text-amber-600 font-bold text-sm bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200 mb-4 flex items-center gap-1.5 hidden">
+            <i class="fa-solid fa-star text-yellow-500 text-base animate-bounce"></i> 獲得了 1 顆努力奮鬥之星！🌟
+        </div>
+        <p id="score-msg" class="text-base font-bold text-gray-600 mb-8 whitespace-pre-line max-w-xs leading-relaxed"></p>
+        
+        <div id="result-actions" class="w-full space-y-3 max-w-xs">
+            <button onclick="closeResult()" class="btn-primary w-full py-4 font-bold text-lg shadow-md">返回大本營</button>
+        </div>
+    </div>
 
-        // =========================================================================
-        // 主元件 (SoobinStudyApp)
-        // =========================================================================
-        function SoobinStudyApp() {
-            const [step, setStep] = useState('setup'); // 'setup' | 'dashboard'
-            const [config, setConfig] = useState({
-                grade: '',
-                subject: '數學', // 預設為數學
-                semester: '',
-                examRange: ''
-            });
+    <main class="max-w-4xl mx-auto px-4 md:px-6 pb-20">
+        
+        <section id="page-grades" class="max-w-md mx-auto">
+            <div id="app-img-container" class="mb-4"></div>
+            <div class="soobin-bubble">"今天也要跟我一起加油學習喔！🌱<br>目前我們已經累積了 <span id="welcome-stars" class="text-amber-500 font-black">0</span> 顆奮鬥之星囉！<br>今天想先看哪個年級呢？"</div>
+            <div class="grid grid-cols-2 gap-4" id="grade-buttons-container"></div>
+        </section>
 
-            return (
-                <div class="min-h-screen p-4 md:p-8">
-                    <div class="max-w-5xl mx-auto">
-                        {step === 'setup' ? (
-                            <SetupScreen config={config} setConfig={setConfig} setStep={setStep} />
-                        ) : (
-                            <DashboardScreen config={config} setStep={setStep} />
-                        )}
-                    </div>
-                </div>
-            );
-        }
+        <section id="page-subjects" class="hidden max-w-md mx-auto">
+            <div id="grade-img-container" class="mb-4"></div>
+            <button onclick="showPage('page-grades')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回年級選擇</button>
+            <h2 id="grade-title" class="text-xl font-bold text-gray-800 mb-6 text-center"></h2>
+            <div class="grid grid-cols-2 gap-4" id="subject-buttons-container"></div>
+        </section>
 
-        // =========================================================================
-        // 1. 初始設定畫面 (選擇 年級、科目、學期、考試範圍)
-        // =========================================================================
-        function SetupScreen({ config, setConfig, setStep }) {
-            const grades = ['7年級', '8年級', '9年級', '10年級', '11年級', '12年級'];
-            const semesters = ['上學期', '下學期'];
-            const exams = ['第一次段考', '第二次段考', '第三次段考'];
+        <section id="page-semesters" class="hidden max-w-md mx-auto">
+            <div id="subject-img-container" class="mb-4"></div>
+            <button onclick="showPage('page-subjects')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回科目選擇</button>
+            <h2 id="subject-title" class="text-xl font-bold text-gray-800 mb-6 text-center"></h2>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="selectSemester('上學期')" class="grid-btn">🍁 上學期</button>
+                <button onclick="selectSemester('下學期')" class="grid-btn">🌸 下學期</button>
+            </div>
+        </section>
 
-            const isReady = config.grade && config.semester && config.examRange;
+        <section id="page-exams" class="hidden max-w-md mx-auto">
+            <div id="semester-img-container" class="mb-4"></div>
+            <button onclick="showPage('page-semesters')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回學期選擇</button>
+            <h2 id="semester-title" class="text-xl font-bold text-gray-800 mb-6 text-center"></h2>
+            <div class="grid grid-cols-1 gap-4">
+                <button onclick="selectExam('第一段考')" class="grid-btn">✍️ 第一段考</button>
+                <button onclick="selectExam('第二段考')" class="grid-btn">✍️ 第二段考</button>
+                <button onclick="selectExam('第三段考')" class="grid-btn">✍️ 第三段考</button>
+            </div>
+        </section>
 
-            const handleStart = () => {
-                if (isReady) setStep('dashboard');
-            };
-
-            return (
-                <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_10px_30px_rgba(255,182,193,0.25)] border-2 border-[#FFEDF0] text-center mt-10">
-                    <h1 class="text-3xl font-bold text-[#FF85A2] mb-4">🌸 打造專屬我的學習空間 🌸</h1>
-                    <p class="text-lg text-[#FF9AA2] mb-8 font-medium leading-relaxed">
-                        "嗨！今天的學習也跟我一起開心地進行吧！🐰✨<br/>
-                        我們要先選擇哪一個範圍來衝刺呢？"
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-left">
-                        {/* 年級選擇 */}
-                        <div class="bg-[#FFF5F7] p-5 rounded-2xl">
-                            <label class="block text-sm font-bold text-[#FF85A2] mb-3">1. 選擇年級 🧸</label>
-                            <select 
-                                class="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
-                                value={config.grade}
-                                onChange={(e) => setConfig({ ...config, grade: e.target.value })}
-                            >
-                                <option value="">請選擇年級唷！</option>
-                                {grades.map(g => <option key={g} value={g}>{g}</option>)}
-                            </select>
-                        </div>
-
-                        {/* 學期選擇 */}
-                        <div class="bg-[#FFF5F7] p-5 rounded-2xl">
-                            <label class="block text-sm font-bold text-[#FF85A2] mb-3">2. 選擇學期 🎀</label>
-                            <select 
-                                class="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
-                                value={config.semester}
-                                onChange={(e) => setConfig({ ...config, semester: e.target.value })}
-                            >
-                                <option value="">請選擇學期唷！</option>
-                                {semesters.map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
-                        </div>
-
-                        {/* 範圍選擇 */}
-                        <div class="bg-[#FFF5F7] p-5 rounded-2xl">
-                            <label class="block text-sm font-bold text-[#FF85A2] mb-3">3. 考試範圍 🎯</label>
-                            <select 
-                                class="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
-                                value={config.examRange}
-                                onChange={(e) => setConfig({ ...config, examRange: e.target.value })}
-                            >
-                                <option value="">今天想讀到哪裡呢？</option>
-                                {exams.map(e => <option key={e} value={e}>{e}</option>)}
-                            </select>
-                        </div>
-                    </div>
-
-                    <button 
-                        onClick={handleStart}
-                        disabled={!isReady}
-                        class={`w-full md:w-1/2 py-4 rounded-2xl font-bold text-lg transition-all ${
-                            isReady 
-                                ? 'bg-[#FF85A2] hover:bg-[#FF6B8B] text-white shadow-lg cursor-pointer' 
-                                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                        }`}
-                    >
-                        {isReady ? "準備就緒！我們一起去學習吧 🚀" : "請幫我選好上面的所有項目唷！🥺"}
-                    </button>
-                </div>
-            );
-        }
-
-        // =========================================================================
-        // 2. 主大本營畫面 (雙軌並列架構：單元學習 vs 歷屆考古題)
-        // =========================================================================
-        function DashboardScreen({ config, setStep }) {
-            // 模擬並列數據 (출판사, 학년도, 학교명 매핑 연동형)
-            const units = [
-                { id: 1, name: "單元 5：統計圖表與數據分析" },
-                { id: 2, name: "單元 6：機率與生活應用" }
-            ];
+        <section id="page-home" class="hidden">
+            <div class="text-center max-w-md mx-auto">
+                <div id="sub-img-container" class="mb-4"></div>
+                <button onclick="showPage('page-exams')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回段考選擇</button>
+                <h2 id="welcome-msg" class="text-2xl font-bold text-gray-800 mb-6"></h2>
+            </div>
             
-            const exams = [
-                { id: 1, year: "112", publisher: "翰林", school: "景美國中", questions: 25 },
-                { id: 2, year: "113", publisher: "康軒", school: "明湖國中", questions: 28 }
-            ];
-
-            const handleCheer = () => {
-                alert("哇，真的辛苦了！你今天真的表現得最棒了！吃點好吃的，稍微休息一下吧！🍭✨");
-            };
-
-            const handleRetry = () => {
-                alert("沒關係的，現在寫錯是為了正式考試時不犯錯，我們提前練習而已嘛！摸摸頭～🧸💕 你一定可以的！");
-            };
-
-            return (
-                <div class="space-y-8">
-                    {/* 上端當前狀態 & 秀彬老師的溫暖應援 */}
-                    <div class="bg-white p-6 rounded-3xl shadow-[0_8px_25px_rgba(255,182,193,0.15)] border border-[#FFEDF0] flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div>
-                            <div class="inline-block px-4 py-1.5 bg-[#FFF5F7] rounded-full text-[#FF85A2] text-sm font-bold border border-[#FFEDF0] mb-3">
-                                🌸 {config.grade} | {config.subject} | {config.semester} | {config.examRange}
-                            </div>
-                            <p class="text-slate-600 font-medium text-lg">
-                                "今天也很努力地走到這裡了呢！要再加把勁嗎？我會在身邊陪著你、為你加油的！🐰✨"
-                            </p>
-                        </div>
-                        <button 
-                            onClick={() => setStep('setup')}
-                            class="px-5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-xl font-medium text-sm transition-colors whitespace-nowrap"
-                        >
-                            ⚙️ 重新選擇範圍
-                        </button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                
+                <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-pink-100 flex flex-col">
+                    <div class="border-b-2 border-pink-50 pb-3 mb-5">
+                        <h3 class="text-xl font-bold text-pink-600 flex items-center gap-2">
+                            📁 單元精熟學習
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-1">請選擇單元進行觀念複習與測驗</p>
                     </div>
-
-                    {/* 雙軌並列版面 (左側：單元學習 vs 右側：歷屆考古題) */}
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        
-                        {/* 左側：單元精熟學習 */}
-                        <div class="bg-white p-8 rounded-[2rem] shadow-[0_8px_25px_rgba(255,182,193,0.15)] border-2 border-[#FFEDF0] flex flex-col">
-                            <div class="border-b-2 border-[#FFF5F7] pb-4 mb-6">
-                                <h2 class="text-2xl font-bold text-[#FF85A2] flex items-center gap-2">
-                                    📖 單元精熟學習
-                                </h2>
-                            </div>
-                            
-                            <div class="space-y-4 flex-1">
-                                {units.map(unit => (
-                                    <div key={unit.id} class="group bg-[#FFF5F7] p-5 rounded-2xl hover:bg-[#FFEDF0] transition-colors cursor-pointer border border-transparent hover:border-[#FFB7C5]">
-                                        <h3 class="font-bold text-[#FF85A2] text-lg mb-2">{unit.name}</h3>
-                                        <div class="text-sm text-[#FF9AA2] font-medium flex items-center gap-1 opacity-80 group-hover:opacity-100">
-                                            <span onClick={handleRetry} class="cursor-pointer">💡 秀彬老師提示：這個部分這樣想的話會簡單很多喔！我們一步一步來吧 🐰</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* 右側：歷屆全範圍考古題 */}
-                        <div class="bg-white p-8 rounded-[2rem] shadow-[0_8px_25px_rgba(255,182,193,0.15)] border-2 border-[#FFEDF0] flex flex-col">
-                            <div class="border-b-2 border-[#FFF5F7] pb-4 mb-6 flex justify-between items-end">
-                                <h2 class="text-2xl font-bold text-[#FF85A2] flex items-center gap-2">
-                                    🎯 歷屆全範圍考古題
-                                </h2>
-                                <span class="text-xs font-bold text-[#FFB7C5]">準備好了嗎？集中精神，就寫一回就好！🍀</span>
-                            </div>
-
-                            <div class="space-y-4 flex-1">
-                                {exams.map(exam => (
-                                    <div key={exam.id} class="bg-white border-2 border-[#FFF5F7] p-5 rounded-2xl flex flex-col gap-4 hover:border-[#FFB7C5] transition-colors shadow-sm">
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            {/* 學年度 */}
-                                            <span class="bg-[#FFB7C5] text-white text-xs font-bold px-2.5 py-1 rounded-md">
-                                                {exam.year}學年度
-                                            </span>
-                                            {/* 出版社 */}
-                                            <span class="bg-[#FFF5F7] text-[#FF85A2] border border-[#FFEDF0] text-xs font-bold px-2.5 py-1 rounded-md">
-                                                {exam.publisher}版
-                                            </span>
-                                            {/* 學校名稱 */}
-                                            <span class="text-slate-700 font-bold text-base ml-1">
-                                                {exam.school}
-                                            </span>
-                                        </div>
-                                        
-                                        <div class="flex justify-between items-center mt-1">
-                                            <span class="text-xs text-slate-400 font-medium">共 {exam.questions} 題</span>
-                                            <button 
-                                                onClick={handleCheer}
-                                                class="bg-[#FF85A2] hover:bg-[#FF6B8B] text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md transition-all active:scale-95"
-                                            >
-                                                開始挑戰 ✨
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                    </div>
+                    <div id="unit-list-container" class="space-y-3 flex-1"></div>
                 </div>
-            );
-        }
 
-        // 렌더링 파이프라인 구동
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<SoobinStudyApp />);
-    </script>
-</body>
-</html>
+                <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-purple-100 flex flex-col">
+                    <div class="border-b-2 border-purple-50 pb-3 mb-5">
+                        <h3 class="text-xl font-bold text-purple-600 flex items-center gap-2">
+                            📝 歷屆全範圍考古題
+                        </h3>
+                        <p class="text-xs text-gray-400 mt-1">針對此段考範圍進行模擬實戰</p>
+                    </div>
+                    <div id="exam-papers-container" class="space-y-3 flex-1"></div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-8 max-w-md mx-auto">
+                <button onclick="startReview('normal')" class="glass p-4 text-left border-2 border-pink-200 hover:bg-pink-50 transition-colors">
+                    <div class="text-sm font-bold text-pink-600 mb-1">📒 診斷錯題本</div>
+                    <p id="review
