@@ -1,217 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Soobin Style 學習大本營 🌸</title>
+    
+    <!-- React 및 런타임 컴파일러 인젝션 -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 대만 학생들이 가장 선호하는 깔끔한 번체 폰트 로드 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #FFF5F7; /* 수빈 스타일의 상징: 연분홍 파스텔 배경 */
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-700">
 
-import React, { useState } from 'react';
+    <!-- React 코드가 렌더링될 실제 루트 노드 -->
+    <div id="root"></div>
 
-// =========================================================================
-// 主元件 (SoobinStudyApp)
-// =========================================================================
-export default function SoobinStudyApp() {
-  const [step, setStep] = useState('setup'); // 'setup' | 'dashboard'
-  const [config, setConfig] = useState({
-    grade: '',
-    subject: '數學', // 預設為數學
-    semester: '',
-    examRange: ''
-  });
+    <!-- 브라우저가 실시간으로 React를 해석할 수 있도록 text/babel 형식으로 작성 -->
+    <script type="text/babel">
+        const { useState } = React;
 
-  return (
-    <div className="min-h-screen bg-[#FFF5F7] text-slate-700 p-4 md:p-8 font-sans">
-      <div className="max-w-5xl mx-auto">
-        {step === 'setup' ? (
-          <SetupScreen config={config} setConfig={setConfig} setStep={setStep} />
-        ) : (
-          <DashboardScreen config={config} setStep={setStep} />
-        )}
-      </div>
-    </div>
-  );
-}
+        // =========================================================================
+        // 主元件 (SoobinStudyApp)
+        // =========================================================================
+        function SoobinStudyApp() {
+            const [step, setStep] = useState('setup'); // 'setup' | 'dashboard'
+            const [config, setConfig] = useState({
+                grade: '',
+                subject: '數學', // 預設為數學
+                semester: '',
+                examRange: ''
+            });
 
-// =========================================================================
-// 1. 初始設定畫面 (選擇 年級、科目、學期、考試範圍)
-// =========================================================================
-function SetupScreen({ config, setConfig, setStep }) {
-  const grades = ['7年級', '8年級', '9年級', '10年級', '11年級', '12年級'];
-  const semesters = ['上學期', '下學期'];
-  const exams = ['第一次段考', '第二次段考', '第三次段考'];
-
-  const isReady = config.grade && config.semester && config.examRange;
-
-  const handleStart = () => {
-    if (isReady) setStep('dashboard');
-  };
-
-  return (
-    <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_10px_30px_rgba(255,182,193,0.25)] border-2 border-[#FFEDF0] text-center mt-10">
-      <h1 className="text-3xl font-bold text-[#FF85A2] mb-4">🌸 打造專屬我的學習空間 🌸</h1>
-      <p className="text-lg text-[#FF9AA2] mb-8 font-medium leading-relaxed">
-        "嗨！今天的學習也跟我一起開心地進行吧！🐰✨<br/>
-        我們要先選擇哪一個範圍來衝刺呢？"
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-left">
-        {/* 年級選擇 */}
-        <div className="bg-[#FFF5F7] p-5 rounded-2xl">
-          <label className="block text-sm font-bold text-[#FF85A2] mb-3">1. 選擇年級 🧸</label>
-          <select 
-            className="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
-            value={config.grade}
-            onChange={(e) => setConfig({ ...config, grade: e.target.value })}
-          >
-            <option value="">請選擇年級唷！</option>
-            {grades.map(g => <option key={g} value={g}>{g}</option>)}
-          </select>
-        </div>
-
-        {/* 學期選擇 */}
-        <div className="bg-[#FFF5F7] p-5 rounded-2xl">
-          <label className="block text-sm font-bold text-[#FF85A2] mb-3">2. 選擇學期 🎀</label>
-          <select 
-            className="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
-            value={config.semester}
-            onChange={(e) => setConfig({ ...config, semester: e.target.value })}
-          >
-            <option value="">請選擇學期唷！</option>
-            {semesters.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-
-        {/* 範圍選擇 */}
-        <div className="bg-[#FFF5F7] p-5 rounded-2xl">
-          <label className="block text-sm font-bold text-[#FF85A2] mb-3">3. 考試範圍 🎯</label>
-          <select 
-            className="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
-            value={config.examRange}
-            onChange={(e) => setConfig({ ...config, examRange: e.target.value })}
-          >
-            <option value="">今天想讀到哪裡呢？</option>
-            {exams.map(e => <option key={e} value={e}>{e}</option>)}
-          </select>
-        </div>
-      </div>
-
-      <button 
-        onClick={handleStart}
-        disabled={!isReady}
-        className={`w-full md:w-1/2 py-4 rounded-2xl font-bold text-lg transition-all ${
-          isReady 
-            ? 'bg-[#FF85A2] hover:bg-[#FF6B8B] text-white shadow-lg cursor-pointer' 
-            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-        }`}
-      >
-        {isReady ? "準備就緒！我們一起去學習吧 🚀" : "請幫我選好上面的所有項目唷！🥺"}
-      </button>
-    </div>
-  );
-}
-
-// =========================================================================
-// 2. 主大本營畫面 (雙軌並列架構：單元學習 vs 歷屆考古題)
-// =========================================================================
-function DashboardScreen({ config, setStep }) {
-  // 模擬並列數據
-  const units = [
-    { id: 1, name: "單元 5：統計圖表與數據分析" },
-    { id: 2, name: "單元 6：機率與生活應用" }
-  ];
-  
-  const exams = [
-    { id: 1, year: "112", publisher: "翰林", school: "景美國中", questions: 25 },
-    { id: 2, year: "113", publisher: "康軒", school: "明湖國中", questions: 28 }
-  ];
-
-  const handleCheer = () => {
-    alert("哇，真的辛苦了！你今天真的表現得最棒了！吃點好吃的，稍微休息一下吧！🍭✨");
-  };
-
-  const handleRetry = () => {
-    alert("沒關係的，現在寫錯是為了正式考試時不犯錯，我們提前練習而已嘛！摸摸頭～🧸💕 你一定可以的！");
-  };
-
-  return (
-    <div className="space-y-8">
-      {/* 上端當前狀態 & 秀彬老師的溫暖應원 */}
-      <div className="bg-white p-6 rounded-3xl shadow-[0_8px_25px_rgba(255,182,193,0.15)] border border-[#FFEDF0] flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <div className="inline-block px-4 py-1.5 bg-[#FFF5F7] rounded-full text-[#FF85A2] text-sm font-bold border border-[#FFEDF0] mb-3">
-            🌸 {config.grade} | {config.subject} | {config.semester} | {config.examRange}
-          </div>
-          <p className="text-slate-600 font-medium text-lg">
-            "今天也很努力地走到這裡了呢！要再加把勁嗎？我會在身邊陪著你、為你加油的！🐰✨"
-          </p>
-        </div>
-        <button 
-          onClick={() => setStep('setup')}
-          className="px-5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-xl font-medium text-sm transition-colors whitespace-nowrap"
-        >
-          ⚙️ 重新選擇範圍
-        </button>
-      </div>
-
-      {/* 雙軌並列版面 (左側：單元學習 vs 右側：歷屆考古題) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* 左側：單元精熟學習 */}
-        <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_25px_rgba(255,182,193,0.15)] border-2 border-[#FFEDF0] flex flex-col">
-          <div className="border-b-2 border-[#FFF5F7] pb-4 mb-6">
-            <h2 className="text-2xl font-bold text-[#FF85A2] flex items-center gap-2">
-              📖 單元精熟學習
-            </h2>
-          </div>
-          
-          <div className="space-y-4 flex-1">
-            {units.map(unit => (
-              <div key={unit.id} className="group bg-[#FFF5F7] p-5 rounded-2xl hover:bg-[#FFEDF0] transition-colors cursor-pointer border border-transparent hover:border-[#FFB7C5]">
-                <h3 className="font-bold text-[#FF85A2] text-lg mb-2">{unit.name}</h3>
-                <div className="text-sm text-[#FF9AA2] font-medium flex items-center gap-1 opacity-80 group-hover:opacity-100">
-                  <span onClick={handleRetry} className="cursor-pointer">💡 秀彬老師提示：這個部分這樣想的話會簡單很多喔！我們一步一步來吧 🐰</span>
+            return (
+                <div class="min-h-screen p-4 md:p-8">
+                    <div class="max-w-5xl mx-auto">
+                        {step === 'setup' ? (
+                            <SetupScreen config={config} setConfig={setConfig} setStep={setStep} />
+                        ) : (
+                            <DashboardScreen config={config} setStep={setStep} />
+                        )}
+                    </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+            );
+        }
 
-        {/* 右側：歷屆全範圍考古題 */}
-        <div className="bg-white p-8 rounded-[2rem] shadow-[0_8px_25px_rgba(255,182,193,0.15)] border-2 border-[#FFEDF0] flex flex-col">
-          <div className="border-b-2 border-[#FFF5F7] pb-4 mb-6 flex justify-between items-end">
-            <h2 className="text-2xl font-bold text-[#FF85A2] flex items-center gap-2">
-              🎯 歷屆全範圍考古題
-            </h2>
-            <span className="text-xs font-bold text-[#FFB7C5]">準備好了嗎？集中精神，就寫一回就好！🍀</span>
-          </div>
+        // =========================================================================
+        // 1. 初始設定畫面 (選擇 年級、科目、學期、考試範圍)
+        // =========================================================================
+        function SetupScreen({ config, setConfig, setStep }) {
+            const grades = ['7年級', '8年級', '9年級', '10年級', '11年級', '12年級'];
+            const semesters = ['上學期', '下學期'];
+            const exams = ['第一次段考', '第二次段考', '第三次段考'];
 
-          <div className="space-y-4 flex-1">
-            {exams.map(exam => (
-              <div key={exam.id} className="bg-white border-2 border-[#FFF5F7] p-5 rounded-2xl flex flex-col gap-4 hover:border-[#FFB7C5] transition-colors shadow-sm">
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* 學年度 */}
-                  <span className="bg-[#FFB7C5] text-white text-xs font-bold px-2.5 py-1 rounded-md">
-                    {exam.year}學年度
-                  </span>
-                  {/* 出版社 */}
-                  <span className="bg-[#FFF5F7] text-[#FF85A2] border border-[#FFEDF0] text-xs font-bold px-2.5 py-1 rounded-md">
-                    {exam.publisher}版
-                  </span>
-                  {/* 學校名稱 */}
-                  <span className="text-slate-700 font-bold text-base ml-1">
-                    {exam.school}
-                  </span>
+            const isReady = config.grade && config.semester && config.examRange;
+
+            const handleStart = () => {
+                if (isReady) setStep('dashboard');
+            };
+
+            return (
+                <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-[0_10px_30px_rgba(255,182,193,0.25)] border-2 border-[#FFEDF0] text-center mt-10">
+                    <h1 class="text-3xl font-bold text-[#FF85A2] mb-4">🌸 打造專屬我的學習空間 🌸</h1>
+                    <p class="text-lg text-[#FF9AA2] mb-8 font-medium leading-relaxed">
+                        "嗨！今天的學習也跟我一起開心地進行吧！🐰✨<br/>
+                        我們要先選擇哪一個範圍來衝刺呢？"
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-left">
+                        {/* 年級選擇 */}
+                        <div class="bg-[#FFF5F7] p-5 rounded-2xl">
+                            <label class="block text-sm font-bold text-[#FF85A2] mb-3">1. 選擇年級 🧸</label>
+                            <select 
+                                class="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
+                                value={config.grade}
+                                onChange={(e) => setConfig({ ...config, grade: e.target.value })}
+                            >
+                                <option value="">請選擇年級唷！</option>
+                                {grades.map(g => <option key={g} value={g}>{g}</option>)}
+                            </select>
+                        </div>
+
+                        {/* 學期選擇 */}
+                        <div class="bg-[#FFF5F7] p-5 rounded-2xl">
+                            <label class="block text-sm font-bold text-[#FF85A2] mb-3">2. 選擇學期 🎀</label>
+                            <select 
+                                class="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
+                                value={config.semester}
+                                onChange={(e) => setConfig({ ...config, semester: e.target.value })}
+                            >
+                                <option value="">請選擇學期唷！</option>
+                                {semesters.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                        </div>
+
+                        {/* 範圍選擇 */}
+                        <div class="bg-[#FFF5F7] p-5 rounded-2xl">
+                            <label class="block text-sm font-bold text-[#FF85A2] mb-3">3. 考試範圍 🎯</label>
+                            <select 
+                                class="w-full p-3 rounded-xl bg-white border border-[#FFEDF0] text-slate-600 outline-none focus:border-[#FF85A2]"
+                                value={config.examRange}
+                                onChange={(e) => setConfig({ ...config, examRange: e.target.value })}
+                            >
+                                <option value="">今天想讀到哪裡呢？</option>
+                                {exams.map(e => <option key={e} value={e}>{e}</option>)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={handleStart}
+                        disabled={!isReady}
+                        class={`w-full md:w-1/2 py-4 rounded-2xl font-bold text-lg transition-all ${
+                            isReady 
+                                ? 'bg-[#FF85A2] hover:bg-[#FF6B8B] text-white shadow-lg cursor-pointer' 
+                                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                        }`}
+                    >
+                        {isReady ? "準備就緒！我們一起去學習吧 🚀" : "請幫我選好上面的所有項目唷！🥺"}
+                    </button>
                 </div>
-                
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-xs text-slate-400 font-medium">共 {exam.questions} 題</span>
-                  <button 
-                    onClick={handleCheer}
-                    className="bg-[#FF85A2] hover:bg-[#FF6B8B] text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md transition-all active:scale-95"
-                  >
-                    開始挑戰 ✨
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+            );
+        }
 
-      </div>
-    </div>
-  );
-}
+        // =========================================================================
+        // 2. 主大本營畫面 (雙軌並列架構：單元學習 vs 歷屆考古題)
+        // =========================================================================
+        function DashboardScreen({ config, setStep }) {
+            // 模擬並列數據 (출판사, 학년도, 학교명 매핑 연동형)
+            const units = [
+                { id: 1, name: "單元 5：統計圖表與數據分析" },
+                { id: 2, name: "單元 6：機率與生活應用" }
+            ];
+            
+            const exams = [
+                { id: 1, year: "112", publisher: "翰林", school: "景美國中", questions: 25 },
+                { id: 2, year: "113", publisher: "康軒", school: "明湖國中", questions: 28 }
+            ];
+
+            const handleCheer = () => {
+                alert("哇，真的辛苦了！你今天真的表現得最棒了！吃點好吃的，稍微休息一下吧！🍭✨");
+            };
+
+            const handleRetry = () => {
+                alert("沒關係的，現在寫錯是為了正式考試時不犯錯，我們提前練習而已嘛！摸摸頭～🧸💕 你一定可以的！");
+            };
+
+            return (
+                <div class="space-y-8">
+                    {/* 上端當前狀態 & 秀彬老師的溫暖應援 */}
+                    <div class="bg-white p-6 rounded-3xl shadow-[0_8px_25px_rgba(255,182,193,0.15)] border border-[#FFEDF0] flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <div class="inline-block px-4 py-1.5 bg-[#FFF5F7] rounded-full text-[#FF85A2] text-sm font-bold border border-[#FFEDF0] mb-3">
+                                🌸 {config.grade} | {config.subject} | {config.semester} | {config.examRange}
+                            </div>
+                            <p class="text-slate-600 font-medium text-lg">
+                                "今天也很努力地走到這裡了呢！要再加把勁嗎？我會在身邊陪著你、為你加油的！🐰✨"
+                            </p>
+                        </div>
+                        <button 
+                            onClick={() => setStep('setup')}
+                            class="px-5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-500 rounded-xl font-medium text-sm transition-colors whitespace-nowrap"
+                        >
+                            ⚙️ 重新選擇範圍
+                        </button>
+                    </div>
+
+                    {/* 雙軌並列版面 (左側：單元學習 vs 右側：歷屆考古題) */}
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        
+                        {/* 左側：單元精熟學習 */}
+                        <div class="bg-white p-8 rounded-[2rem] shadow-[0_8px_25px_rgba(255,182,193,0.15)] border-2 border-[#FFEDF0] flex flex-col">
+                            <div class="border-b-2 border-[#FFF5F7] pb-4 mb-6">
+                                <h2 class="text-2xl font-bold text-[#FF85A2] flex items-center gap-2">
+                                    📖 單元精熟學習
+                                </h2>
+                            </div>
+                            
+                            <div class="space-y-4 flex-1">
+                                {units.map(unit => (
+                                    <div key={unit.id} class="group bg-[#FFF5F7] p-5 rounded-2xl hover:bg-[#FFEDF0] transition-colors cursor-pointer border border-transparent hover:border-[#FFB7C5]">
+                                        <h3 class="font-bold text-[#FF85A2] text-lg mb-2">{unit.name}</h3>
+                                        <div class="text-sm text-[#FF9AA2] font-medium flex items-center gap-1 opacity-80 group-hover:opacity-100">
+                                            <span onClick={handleRetry} class="cursor-pointer">💡 秀彬老師提示：這個部分這樣想的話會簡單很多喔！我們一步一步來吧 🐰</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 右側：歷屆全範圍考古題 */}
+                        <div class="bg-white p-8 rounded-[2rem] shadow-[0_8px_25px_rgba(255,182,193,0.15)] border-2 border-[#FFEDF0] flex flex-col">
+                            <div class="border-b-2 border-[#FFF5F7] pb-4 mb-6 flex justify-between items-end">
+                                <h2 class="text-2xl font-bold text-[#FF85A2] flex items-center gap-2">
+                                    🎯 歷屆全範圍考古題
+                                </h2>
+                                <span class="text-xs font-bold text-[#FFB7C5]">準備好了嗎？集中精神，就寫一回就好！🍀</span>
+                            </div>
+
+                            <div class="space-y-4 flex-1">
+                                {exams.map(exam => (
+                                    <div key={exam.id} class="bg-white border-2 border-[#FFF5F7] p-5 rounded-2xl flex flex-col gap-4 hover:border-[#FFB7C5] transition-colors shadow-sm">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            {/* 學年度 */}
+                                            <span class="bg-[#FFB7C5] text-white text-xs font-bold px-2.5 py-1 rounded-md">
+                                                {exam.year}學年度
+                                            </span>
+                                            {/* 出版社 */}
+                                            <span class="bg-[#FFF5F7] text-[#FF85A2] border border-[#FFEDF0] text-xs font-bold px-2.5 py-1 rounded-md">
+                                                {exam.publisher}版
+                                            </span>
+                                            {/* 學校名稱 */}
+                                            <span class="text-slate-700 font-bold text-base ml-1">
+                                                {exam.school}
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center mt-1">
+                                            <span class="text-xs text-slate-400 font-medium">共 {exam.questions} 題</span>
+                                            <button 
+                                                onClick={handleCheer}
+                                                class="bg-[#FF85A2] hover:bg-[#FF6B8B] text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md transition-all active:scale-95"
+                                            >
+                                                開始挑戰 ✨
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            );
+        }
+
+        // 렌더링 파이프라인 구동
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SoobinStudyApp />);
+    </script>
+</body>
+</html>
