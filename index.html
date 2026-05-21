@@ -3,822 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 수제비 선생님 V22 (Final Ultimate)</title>
-    <!-- Tailwind CSS, FontAwesome, Confetti(폭죽) 라이브러리 로드 -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <title>秀彬老師的伴讀空間 V24</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fdf2f8; color: #333; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.95); border-radius: 1.5rem; border: 1px solid rgba(255, 192, 203, 0.3); }
-        .btn-primary { background: linear-gradient(45deg, #ff75c3, #ffad71); color: white; border:none; border-radius: 1rem; cursor: pointer; }
-        .grid-btn { background: white; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; position: relative; z-index: 10; text-align: center; }
-        .grid-btn:hover { background-color: #fce7f3; transform: translateY(-2px); }
-        .summary-box { white-space: pre-wrap; line-height: 1.8; font-size: 1.05rem; }
-        .highlight { background-color: #fff3cd; padding: 2px 5px; border-radius: 4px; font-weight: bold; color: #92400e; }
-        .fit-img { width: 100%; height: auto; max-height: 250px; object-fit: contain; background-color: #fff; border-radius: 1.5rem; margin-bottom: 1rem; pointer-events: none; }
-        .soobin-bubble { background: #fff; border: 2px solid #fbcfe8; border-radius: 1rem; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; color: #db2777; font-weight: bold; text-align: center; }
-        .hidden { display: none !important; }
-        .result-card { position: fixed; inset: 0; background: rgba(255,255,255,0.97); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #ff75c3; }
-        input:checked + .slider:before { transform: translateX(26px); }
-        
-        /* 백오피스 하이라이트 스타일 */
-        .admin-select-active { background-color: #fbcfe8 !important; border-color: #db2777 !important; font-weight: bold; }
+        :root {
+            --primary-color: #4da6ff;
+            --bg-color: #f4f7f6;
+            --box-bg: #ffffff;
+            --text-color: #333333;
+        }
+        body {
+            font-family: 'PingFang TC', 'Heiti TC', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        /* 上方導覽分頁 */
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #ddd;
+            transition: 0.3s;
+        }
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        /* 區塊顯示控制 */
+        .view-section {
+            display: none;
+            background: var(--box-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .view-section.active {
+            display: block;
+        }
+        /* 後台表單樣式 */
+        .exam-form-box {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .btn-action {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .btn-delete {
+            background-color: #ff6b6b;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        /* 學生端試卷卡片 */
+        .exam-card {
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fcfcfc;
+        }
+        .exam-info h3 {
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
+        }
+        /* 測驗畫面（秀彬老師主題 UI） */
+        .soobin-header {
+            background-color: #e6f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .soobin-msg {
+            font-size: 18px;
+            color: #0066cc;
+            font-weight: bold;
+            margin-top: 10px;
+        }
     </style>
 </head>
-<body onload="loadFromCloud()">
-    
-    <!-- 상단 네비게이션 대시보드 -->
-    <nav class="p-4 flex justify-between items-center max-w-md mx-auto">
-        <h1 class="text-xl font-bold text-pink-500 flex items-center gap-2" onclick="location.reload()" style="cursor:pointer">
-            ✨ 수제비 선생님
-        </h1>
-        <div class="flex items-center gap-4">
-            <div class="flex items-center gap-1.5 bg-yellow-100 text-amber-600 px-3 py-1 rounded-full font-bold text-sm border border-yellow-200 shadow-sm">
-                <i class="fa-solid fa-star text-yellow-500 animate-pulse"></i>
-                <span id="nav-stars">0</span>
-            </div>
-            <button onclick="checkPassword()" class="text-pink-300 p-1 hover:text-pink-500 transition-colors"><i class="fa-solid fa-gear text-2xl"></i></button>
-        </div>
-    </nav>
+<body>
 
-    <!-- 실시간 로딩 서클 -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
-        <div class="animate-spin text-4xl text-pink-500 mb-4"><i class="fa-solid fa-circle-notch"></i></div>
-        <p class="text-pink-500 font-bold">同步中...</p>
+<div class="container">
+    <!-- 頁面切換標籤 -->
+    <div class="tab-menu">
+        <button class="tab-btn active" onclick="switchView('admin-view')">👩‍💻 媽媽專用管理後台</button>
+        <button class="tab-btn" onclick="switchView('student-list-view')">🐰 秀彬老師的課堂 (學生畫面)</button>
     </div>
 
-    <!-- 100점 축하 팝업 오버레이 -->
-    <div id="result-overlay" class="result-card hidden">
-        <h2 class="text-3xl font-bold text-pink-600 mb-2">測試結束！</h2>
-        <div class="relative my-4">
-            <div id="score-circle" class="text-7xl font-black text-gray-800 bg-pink-100 w-36 h-36 rounded-full flex items-center justify-center border-4 border-pink-400 shadow-inner font-mono">100</div>
-            <div id="perfect-badge" class="absolute -bottom-2 -right-2 bg-yellow-400 text-white p-2 rounded-full text-xs font-black shadow-lg hidden">
-                <i class="fa-solid fa-trophy"></i> PERFECT!
-            </div>
-        </div>
+    <!-- ==============================================
+         1. 後台：考古題試卷登錄畫面
+    =============================================== -->
+    <div id="admin-view" class="view-section active">
+        <h2>🛠️ 歷屆試題資料庫管理</h2>
+        <p>您可以自由輸入出版社與學校名稱，無限制新增多套考古題試卷。</p>
         
-        <div id="star-gain-alert" class="text-amber-600 font-bold text-sm bg-yellow-50 px-4 py-2 rounded-full border border-yellow-200 mb-4 flex items-center gap-1.5 hidden">
-            <i class="fa-solid fa-star text-yellow-500 text-base animate-bounce"></i> 
-            獲得了 1 顆努力奮鬥之星！已同步保存 🌟
+        <div id="admin-exam-container">
+            <!-- 透過 JavaScript 動態新增表單 -->
         </div>
-        <p id="score-msg" class="text-base font-bold text-gray-600 mb-8 whitespace-pre-line max-w-xs leading-relaxed"></p>
-        <button onclick="closeResult()" class="btn-primary px-10 py-4 font-bold text-lg shadow-lg">回主畫面</button>
+
+        <button class="btn-action" style="background-color: #4CAF50;" onclick="addExamForm()">+ 新增一組考古題試卷</button>
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+        <button class="btn-action" style="width: 100%; padding: 15px; font-size: 16px;" onclick="saveExams()">💾 儲存並套用至系統</button>
     </div>
 
-    <main class="max-w-md mx-auto px-6 pb-20">
+
+    <!-- ==============================================
+         2. 學生端：試卷選擇列表
+    =============================================== -->
+    <div id="student-list-view" class="view-section">
+        <h2>📝 選擇今天挑戰的歷屆試題吧！</h2>
+        <div id="student-list-container">
+            <!-- 已登錄的試卷清單將顯示於此 -->
+        </div>
+    </div>
+
+
+    <!-- ==============================================
+         3. 學生端：實際測驗畫面（包含 V22/V23 秀彬老師功能）
+    =============================================== -->
+    <div id="test-view" class="view-section">
+        <div class="soobin-header">
+            <div>🌱 與秀彬老師一起進行實戰訓練</div>
+            <h2 id="test-title" style="margin: 10px 0;">[出版社 - 學校名稱] 模擬測驗</h2>
+            <div class="soobin-msg">「就算寫錯也沒關係，我們有錯題本呀！一起集中精神堅持到最後吧！🐰💙」</div>
+        </div>
         
-        <!-- 1단계: 학년 선택 페이지 -->
-        <section id="page-grades">
-            <div id="app-img-container" class="mb-4"></div>
-            <div class="soobin-bubble">
-                "今天也要跟我一起加油學習喔！🌱<br>
-                目前我們已經累積了 <span id="welcome-stars" class="text-amber-500 font-black">0</span> 顆奮鬥之星囉！<br>
-                今天想先看哪個年級呢？"
-            </div>
-            <div class="grid grid-cols-2 gap-4" id="grade-buttons-container">
-                <!-- JS에서 동적으로 생성 -->
-            </div>
-        </section>
+        <div id="test-content-area" style="min-height: 200px; padding: 20px; background: #fff; border: 1px solid #ddd; border-radius: 8px;">
+            <!-- 題目內容顯示區域 -->
+        </div>
 
-        <!-- 2단계: 과목 선택 페이지 -->
-        <section id="page-subjects" class="hidden">
-            <div id="grade-img-container" class="mb-4"></div>
-            <button onclick="showPage('page-grades')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回年級選擇</button>
-            <h2 id="grade-title" class="text-xl font-bold text-gray-800 mb-6 text-center"></h2>
-            <div class="grid grid-cols-2 gap-4" id="subject-buttons-container">
-                <!-- JS에서 동적으로 생성 -->
-            </div>
-        </section>
+        <div style="margin-top: 20px; text-align: right;">
+            <button class="btn-action" style="background-color: #aaa;" onclick="switchView('student-list-view')">結束測驗 / 返回列表</button>
+        </div>
+    </div>
 
-        <!-- 3단계: 학기 선택 페이지 -->
-        <section id="page-semesters" class="hidden">
-            <div id="subject-img-container" class="mb-4"></div>
-            <button onclick="showPage('page-subjects')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回科目選擇</button>
-            <h2 id="subject-title" class="text-xl font-bold text-gray-800 mb-6 text-center"></h2>
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="selectSemester('上學期')" class="grid-btn">🍁 上學期</button>
-                <button onclick="selectSemester('下學期')" class="grid-btn">🌸 下學期</button>
-            </div>
-        </section>
+</div>
 
-        <!-- 4단계: 段考 선택 페이지 -->
-        <section id="page-exams" class="hidden">
-            <div id="semester-img-container" class="mb-4"></div>
-            <button onclick="showPage('page-semesters')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回學期選擇</button>
-            <h2 id="semester-title" class="text-xl font-bold text-gray-800 mb-6 text-center"></h2>
-            <div class="grid grid-cols-1 gap-4">
-                <button onclick="selectExam('第一段考')" class="grid-btn">✍️ 第一段考</button>
-                <button onclick="selectExam('第二段考')" class="grid-btn">✍️ 第二段考</button>
-                <button onclick="selectExam('第三段考')" class="grid-btn">✍️ 第三段考</button>
-            </div>
-        </section>
+<script>
+    // 全局資料儲存庫（模擬伺服器資料庫）
+    let pastExamsData = [];
+    let formCounter = 0;
 
-        <!-- 5단계: 단원 목록 페이지 -->
-        <section id="page-home" class="hidden text-center">
-            <div id="sub-img-container" class="mb-4"></div>
-            <button onclick="showPage('page-exams')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回段考選擇</button>
-            <h2 id="welcome-msg" class="text-2xl font-bold text-gray-800 mb-6"></h2>
-            <div id="unit-list-container" class="space-y-3 text-left"></div>
-            
-            <button onclick="startReview()" class="glass w-full p-4 mt-6 border-2 border-orange-200 text-left">
-                <div class="font-bold text-pink-600">📒 挑戰秀彬幫你整理的錯題本</div>
-                <p id="review-count" class="text-xs text-gray-400">0 題錯題</p>
-            </button>
-        </section>
+    // 頁面載入時預設新增一個輸入框
+    window.onload = () => {
+        addExamForm();
+    };
 
-        <!-- 6단계: 요점 정리 페이지 -->
-        <section id="page-summary" class="hidden space-y-4">
-            <div id="unit-summary-img-container" class="mb-4"></div>
-            <div class="glass p-6">
-                <h2 id="summary-title" class="text-lg font-bold mb-4 text-pink-600 border-b pb-2"></h2>
-                <div id="summary-text" class="summary-box text-gray-700"></div>
-            </div>
-            <button onclick="startTest()" class="btn-primary w-full py-4 font-bold text-lg shadow-md hover:scale-[1.01] transition-all">複習完畢，開始測試！</button>
-            <button onclick="showPage('page-home')" class="w-full text-gray-400 text-sm underline mt-2">返回單元列表</button>
-        </section>
-
-        <!-- 7단계: 문제 테스트 페이지 -->
-        <section id="page-test" class="hidden">
-            <div id="unit-test-img-container" class="mb-4"></div>
-            <div class="mb-4 text-xs flex justify-between items-center">
-                <button onclick="if(confirm('確定要結束測試嗎？')) showPage('page-home')" class="bg-gray-200 px-3 py-1 rounded-full font-bold text-gray-500">✕ 停止</button>
-                <span id="test-title" class="font-bold text-pink-500"></span>
-                <span id="test-progress" class="font-bold"></span>
-            </div>
-            <div class="glass p-6 min-h-[300px]">
-                <h3 id="q-text" class="text-lg font-bold mb-6 font-medium"></h3>
-                <div id="options" class="space-y-3"></div>
-                <div id="feedback" class="hidden mt-6 p-4 bg-pink-50 rounded-xl">
-                    <p id="feedback-text" class="text-sm font-bold text-gray-700 mb-4 whitespace-pre-line"></p>
-                    <button onclick="nextQ()" class="w-full py-3 btn-primary font-bold">下一題</button>
+    // 後台：動態新增試卷輸入表單
+    function addExamForm() {
+        formCounter++;
+        const container = document.getElementById('admin-exam-container');
+        const formHtml = `
+            <div class="exam-form-box" id="exam-form-${formCounter}">
+                <button class="btn-action btn-delete" onclick="removeExamForm(${formCounter})">刪除</button>
+                <div class="input-group">
+                    <label>請輸入出版社（自由填寫）</label>
+                    <input type="text" class="input-publisher" placeholder="例如：翰林、康軒、南一 等">
+                </div>
+                <div class="input-group">
+                    <label>請輸入學校名稱（自由填寫）</label>
+                    <input type="text" class="input-school" placeholder="例如：景美國中、中正國中 等">
+                </div>
+                <div class="input-group">
+                    <label>考古題題目與答案內容 (可配合 V22/V23 機制)</label>
+                    <textarea class="input-content" rows="4" placeholder="請在此輸入該試卷的題目、詳細答案與錯題解析內容..."></textarea>
                 </div>
             </div>
-        </section>
+        `;
+        container.insertAdjacentHTML('beforeend', formHtml);
+    }
 
-        <!-- [관리자 화면] 백오피스 (V22) -->
-        <section id="page-admin" class="hidden fixed inset-0 bg-white z-[300] p-6 overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V22)</h2>
-                <button onclick="toggleAdmin()" class="text-3xl text-gray-400">&times;</button>
-            </div>
-            
-            <div class="space-y-6">
-                <!-- 이미지 토글 및 별 수동 조절 -->
-                <div class="flex justify-between items-center bg-gray-100 p-4 rounded-xl">
-                    <p class="font-bold text-sm text-gray-700">啟用圖片功能</p>
-                    <label class="switch"><input type="checkbox" id="img-toggle" onchange="db.settings.imgEnabled = this.checked"><span class="slider"></span></label>
-                </div>
-                
-                <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
-                    <p class="text-xs font-bold text-yellow-700 mb-2">⭐ 秀彬目前的奮鬥之星數量 (100점 달성시 자동 +1)</p>
-                    <input type="number" id="admin-stars-count" class="w-full p-2 text-xs border rounded font-bold" min="0">
-                </div>
+    // 後台：刪除試卷表單
+    function removeExamForm(id) {
+        document.getElementById(`exam-form-${id}`).remove();
+    }
 
-                <div class="bg-purple-50 p-4 rounded-xl">
-                    <p class="text-xs font-bold text-purple-600 mb-2">🏠 App 第一頁照片網址 (Vercel 권장)</p>
-                    <input type="text" id="admin-app-img-url" class="w-full p-2 text-xs border rounded">
-                </div>
-
-                <!-- 단계별 선택 후 관리 영역 -->
-                <div class="border p-4 rounded-xl bg-gray-50 space-y-4">
-                    <h3 class="text-sm font-bold text-pink-600 border-b pb-2">🎯 1단계: 請依序選擇欲配置的範圍</h3>
-                    
-                    <!-- 1. 학년 선택 -->
-                    <div>
-                        <p class="text-xs font-bold text-gray-500 mb-1">1. 選擇年級</p>
-                        <div class="grid grid-cols-6 gap-1" id="admin-grade-select"></div>
-                    </div>
-                    
-                    <!-- 2. 과목 선택 -->
-                    <div>
-                        <p class="text-xs font-bold text-gray-500 mb-1">2. 選擇科目</p>
-                        <div class="grid grid-cols-4 gap-1" id="admin-sub-select"></div>
-                    </div>
-
-                    <!-- 3. 학기 선택 -->
-                    <div>
-                        <p class="text-xs font-bold text-gray-500 mb-1">3. 選擇學期</p>
-                        <div class="grid grid-cols-2 gap-1" id="admin-sem-select">
-                            <button onclick="adminSetSem('上學期')" id="ad-sem-上學期" class="border p-2 rounded text-xs bg-white">上學期</button>
-                            <button onclick="adminSetSem('下學期')" id="ad-sem-下學期" class="border p-2 rounded text-xs bg-white">下學期</button>
-                        </div>
-                    </div>
-
-                    <!-- 4. 段考 선택 -->
-                    <div>
-                        <p class="text-xs font-bold text-gray-500 mb-1">4. 選擇段考</p>
-                        <div class="grid grid-cols-3 gap-1" id="admin-exam-select">
-                            <button onclick="adminSetExam('第一段考')" id="ad-exam-第一段考" class="border p-2 rounded text-xs bg-white">第一段考</button>
-                            <button onclick="adminSetExam('第二段考')" id="ad-exam-第二段考" class="border p-2 rounded text-xs bg-white">第二段考</button>
-                            <button onclick="adminSetExam('第三段考')" id="ad-exam-第三段考" class="border p-2 rounded text-xs bg-white">第三段考</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 실시간으로 동적 선택된 범위의 이미지를 업로드할 수 있는 영역 -->
-                <div id="admin-main-area" class="hidden space-y-6">
-                    <div class="bg-blue-50 p-4 rounded-xl space-y-3">
-                        <h4 class="font-bold text-xs text-blue-700">🖼️ 各層級 圖片網址配置 (Vercel 권장)</h4>
-                        
-                        <div>
-                            <p id="admin-label-grade-img" class="text-xs text-gray-500 mb-1"></p>
-                            <input type="text" id="admin-input-grade-img" class="w-full p-2 text-xs border rounded" placeholder="https://...">
-                        </div>
-                        <div>
-                            <p id="admin-label-sub-img" class="text-xs text-gray-500 mb-1"></p>
-                            <input type="text" id="admin-input-sub-img" class="w-full p-2 text-xs border rounded" placeholder="https://...">
-                        </div>
-                        <div>
-                            <p id="admin-label-sem-img" class="text-xs text-gray-500 mb-1"></p>
-                            <input type="text" id="admin-input-sem-img" class="w-full p-2 text-xs border rounded" placeholder="https://...">
-                        </div>
-                        <div>
-                            <p id="admin-label-exam-img" class="text-xs text-gray-500 mb-1"></p>
-                            <input type="text" id="admin-input-exam-img" class="w-full p-2 text-xs border rounded" placeholder="https://...">
-                        </div>
-                    </div>
-
-                    <!-- 해당 범위의 단원 리스트 편집 -->
-                    <div>
-                        <h3 class="font-bold text-sm text-gray-700 mb-2">📋 單元管理 목록</h3>
-                        <div id="admin-unit-list" class="space-y-2"></div>
-                        <button onclick="addUnitRow()" class="w-full py-2 mt-2 border-2 border-dashed border-pink-200 text-pink-400 font-bold rounded-lg">+ 新增單元</button>
-                    </div>
-
-                    <!-- 단원 상세 설정 창 -->
-                    <div id="edit-area" class="hidden bg-white p-4 rounded-xl border-2 border-pink-100 space-y-4">
-                        <h3 class="font-bold text-gray-700">編輯單元: <span id="editing-unit-name" class="text-pink-500"></span></h3>
-                        <input type="text" id="admin-unit-img-url" class="w-full p-2 text-xs border rounded" placeholder="單元 圖片網址 (Vercel 권장)">
-                        <textarea id="admin-summary" class="w-full h-40 p-3 text-xs border rounded" placeholder="重點整理..."></textarea>
-                        <textarea id="admin-questions" class="w-full h-40 p-3 text-xs border rounded" placeholder="JSON 題目..."></textarea>
-                        <button onclick="applyUnitEdit()" class="w-full py-3 bg-pink-500 text-white font-bold rounded-xl">確認暫存</button>
-                    </div>
-                </div>
-
-                <button id="final-save-btn" onclick="saveToCloud()" class="w-full py-5 bg-gray-800 text-white font-bold rounded-2xl shadow-xl text-lg mt-10">💾 儲存並同步至雲端</button>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        const BIN_ID = "6a005e56adc21f119a7c1f86";
-        const MASTER_KEY = "$2a$10$0IMIZdF3/BKscfzxvO6MuepHI4f3d2VXiIus8mfSCo1FIPXoZVFQ.";
-        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-        const ADMIN_PASS = "1234";
-
-        // 전체 지원하는 고정 리스트 정의
-        const gradeList = ["7", "8", "9", "10", "11", "12"];
-        const subjectList = ["自然", "數學", "英文", "國文", "歷史", "地理", "公民", "社會"];
-        const semesterList = ["上學期", "下學期"];
-        const examList = ["第一段考", "第二段考", "第三段考"];
-
-        // 디폴트 로컬 데이터베이스 껍데기 선언
-        let db = { 
-            settings: { imgEnabled: true }, 
-            appMainImg: '', 
-            stars: 0,
-            grades: {}
-        };
-
-        // 선택 진행 상태를 보관하는 메모리 변수
-        let curGrade = '', curSub = '', curSem = '', curExam = '', curUnitIdx = -1;
-        let testList = [], curIdx = 0, score = 0;
-
-        // 백오피스 임시 선택을 관리하는 메모리 변수
-        let adGrade = '', adSub = '', adSem = '', adExam = '';
-
-        // 클라우드 정보 불러오기 및 하위 호환 가상 주입기
-        async function loadFromCloud() {
-            try {
-                const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY } });
-                const data = await res.json();
-                db = data.record || db;
-                
-                // 데이터 하위 구조가 유실되었거나 깨져서 들어왔을 경우 방어적 세팅 돌려 데이터 복구 보장
-                initDBStructure();
-                updateStarUI();
-
-                document.getElementById('img-toggle').checked = db.settings?.imgEnabled ?? true;
-                document.getElementById('admin-app-img-url').value = db.appMainImg || '';
-                document.getElementById('loading-overlay').classList.add('hidden');
-                
-                // 초기 홈화면 구성
-                buildGradeButtons();
-                buildAdminGradeButtons();
-                buildAdminSubButtons();
-
-                showPage('page-grades');
-                renderAppImg();
-            } catch (e) { 
-                console.error("클라우드 연결 오류", e);
-                document.getElementById('loading-overlay').classList.add('hidden'); 
-            }
-        }
-
-        // DB 껍데기 세그먼트 생성 및 이전 V20/V21 버전의 유실을 가드해주는 보안 함수
-        function initDBStructure() {
-            db.stars = db.stars || 0;
-            if(!db.settings) db.settings = { imgEnabled: true };
-            if(!db.grades) db.grades = {};
-
-            gradeList.forEach(g => {
-                if(!db.grades[g]) db.grades[g] = { mainImg: '', subjects: {} };
-                subjectList.forEach(s => {
-                    if(!db.grades[g].subjects[s]) db.grades[g].subjects[s] = { mainImg: '', semesters: {} };
-                    semesterList.forEach(sem => {
-                        if(!db.grades[g].subjects[s].semesters[sem]) db.grades[g].subjects[s].semesters[sem] = { mainImg: '', exams: {} };
-                        examList.forEach(ex => {
-                            if(!db.grades[g].subjects[s].semesters[sem].exams[ex]) {
-                                db.grades[g].subjects[s].semesters[sem].exams[ex] = {
-                                    mainImg: '',
-                                    units: [],
-                                    wrongs: []
-                                };
-                            }
-                        });
-                    });
-                });
-            });
-        }
-
-        function updateStarUI() {
-            document.getElementById('nav-stars').innerText = db.stars;
-            document.getElementById('welcome-stars').innerText = db.stars;
-        }
-
-        // 이미지 로드 유틸리티
-        function createImgTag(url) {
-            if(!url || url.trim() === "") return "";
-            return `<img src="${url.trim()}" class="fit-img shadow-lg" onerror="this.style.display='none'">`;
-        }
-
-        function renderAppImg() {
-            const isImgOn = db.settings?.imgEnabled;
-            document.getElementById('app-img-container').innerHTML = isImgOn ? createImgTag(db.appMainImg) : '';
-        }
-
-        // ================== [학생 화면: UI 전환 및 플로우] ==================
-
-        // 학년 버튼 바인딩
-        function buildGradeButtons() {
-            const container = document.getElementById('grade-buttons-container');
-            container.innerHTML = '';
-            gradeList.forEach(g => {
-                const b = document.createElement('button');
-                b.className = "grid-btn";
-                b.innerText = `${g} 年級`;
-                b.onclick = () => selectGrade(g);
-                container.appendChild(b);
-            });
-        }
-
-        function selectGrade(g) {
-            curGrade = g;
-            document.getElementById('grade-title').innerText = `✨ ${g} 年級`;
-            
-            const isImgOn = db.settings?.imgEnabled;
-            const targetImg = db.grades[g]?.mainImg || '';
-            document.getElementById('grade-img-container').innerHTML = isImgOn ? createImgTag(targetImg) : '';
-            
-            // 학년에 연동된 과목 리스트 구성
-            buildSubjectButtons();
-            showPage('page-subjects');
-        }
-
-        // 과목 버튼 바인딩
-        function buildSubjectButtons() {
-            const container = document.getElementById('subject-buttons-container');
-            container.innerHTML = '';
-            subjectList.forEach(s => {
-                const b = document.createElement('button');
-                b.className = "grid-btn";
-                // 과목에 맞는 귀여운 아이콘 부여
-                let icon = "📚";
-                if (s === "數學") icon = "📐";
-                if (s === "英文") icon = "🔤";
-                if (s === "國文") icon = "📖";
-                if (s === "自然") icon = "🌱";
-                if (s === "歷史") icon = "⏳";
-                if (s === "地理") icon = "🌍";
-                if (s === "公民") icon = "⚖️";
-                if (s === "社會") icon = "👥";
-                
-                b.innerText = `${icon} ${s}`;
-                b.onclick = () => selectSubject(s);
-                container.appendChild(b);
-            });
-        }
-
-        function selectSubject(s) {
-            curSub = s;
-            document.getElementById('subject-title').innerText = `✨ ${curGrade} 年級 - ${curSub}`;
-            
-            const isImgOn = db.settings?.imgEnabled;
-            const targetImg = db.grades[curGrade]?.subjects[s]?.mainImg || '';
-            document.getElementById('subject-img-container').innerHTML = isImgOn ? createImgTag(targetImg) : '';
-            
-            showPage('page-semesters');
-        }
-
-        function selectSemester(sem) {
-            curSem = sem;
-            document.getElementById('semester-title').innerText = `✨ ${curGrade}年級 ${curSub} (${curSem})`;
-            
-            const isImgOn = db.settings?.imgEnabled;
-            const targetImg = db.grades[curGrade]?.subjects[curSub]?.semesters[sem]?.mainImg || '';
-            document.getElementById('semester-img-container').innerHTML = isImgOn ? createImgTag(targetImg) : '';
-            
-            showPage('page-exams');
-        }
-
-        function selectExam(ex) {
-            curExam = ex;
-            showHome();
-        }
-
-        // 최종 단원 리스트 화면
-        function showHome() {
-            document.getElementById('welcome-msg').innerText = `${curGrade}年級 ${curSub} - ${curSem} [${curExam}]`;
-            
-            const examObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
-            
-            const isImgOn = db.settings?.imgEnabled;
-            document.getElementById('sub-img-container').innerHTML = isImgOn ? createImgTag(examObj.mainImg) : '';
-            
-            const listCont = document.getElementById('unit-list-container');
-            listCont.innerHTML = '';
-            
-            const units = examObj.units || [];
-            units.forEach((u, i) => {
-                const btn = document.createElement('button');
-                btn.className = "glass w-full p-5 text-left font-bold shadow-sm mb-2 hover:bg-pink-50 transition-colors";
-                btn.innerText = "📖 " + u.name;
-                btn.onclick = () => showSummary(i);
-                listCont.appendChild(btn);
-            });
-            
-            // 해당 학년/과목/학기/시험의 맞춤형 오답 문항 개수 동기화
-            const wrongsCount = examObj.wrongs?.length || 0;
-            document.getElementById('review-count').innerText = wrongsCount + " 題錯題";
-            
-            showPage('page-home');
-        }
-
-        // 요약 정보 보여주기
-        function showSummary(i) {
-            curUnitIdx = i;
-            const u = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam].units[i];
-            
-            const isImgOn = db.settings?.imgEnabled;
-            document.getElementById('unit-summary-img-container').innerHTML = isImgOn ? createImgTag(u.unitImg) : '';
-            document.getElementById('summary-title').innerText = "💡 " + u.name;
-            document.getElementById('summary-text').innerHTML = (u.summary || "").replace(/\[(.*?)\]/g, '<span class="highlight">$1</span>');
-            
-            showPage('page-summary');
-        }
-
-        // 복습 및 무작위 테스트 시작
-        function startTest() {
-            const originalQs = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam].units[curUnitIdx].questions || [];
-            if(originalQs.length === 0) return alert("這個單元還沒有題目喔！");
-            
-            testList = originalQs.map(q => {
-                let options = q.a.map((text, idx) => ({ text, isCorrect: idx === q.correct }));
-                options.sort(() => Math.random() - 0.5);
-                return { 
-                    q: q.q, 
-                    msg: q.msg, 
-                    a: options.map(o => o.text), 
-                    correct: options.findIndex(o => o.isCorrect) 
-                };
-            }).sort(() => Math.random() - 0.5);
-
-            const u = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam].units[curUnitIdx];
-            const isImgOn = db.settings?.imgEnabled;
-            document.getElementById('unit-test-img-container').innerHTML = isImgOn ? createImgTag(u.unitImg) : '';
-            
-            curIdx = 0; score = 0; updateQ(); showPage('page-test');
-        }
-
-        function updateQ() {
-            const q = testList[curIdx];
-            document.getElementById('test-title').innerText = `✍️ ${curSub} - ${curExam}`;
-            document.getElementById('test-progress').innerText = `${curIdx + 1}/${testList.length}`;
-            document.getElementById('q-text').innerText = q.q;
-            document.getElementById('feedback').classList.add('hidden');
-            const optCont = document.getElementById('options'); optCont.innerHTML = '';
-            
-            q.a.forEach((a, i) => {
-                const b = document.createElement('button');
-                b.className = "w-full text-left p-4 rounded-xl border bg-white font-medium hover:bg-pink-50 transition-colors";
-                b.innerText = a; b.onclick = () => checkAns(i); optCont.appendChild(b);
-            });
-        }
-
-        function checkAns(i) {
-            const q = testList[curIdx];
-            const btns = document.getElementById('options').querySelectorAll('button');
-            btns.forEach(b => b.disabled = true);
-            
-            const examObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
-            
-            if(i === q.correct) {
-                btns[i].style.backgroundColor = '#dcfce7';
-                document.getElementById('feedback-text').innerText = "❤️ 太棒了！答對了！\n" + q.msg;
-                score++;
-            } else {
-                btns[i].style.backgroundColor = '#fee2e2';
-                btns[q.correct].style.backgroundColor = '#dcfce7';
-                document.getElementById('feedback-text').innerText = "😭 哎呀！答錯了。\n" + q.msg;
-                
-                if(!examObj.wrongs) examObj.wrongs = [];
-                if(!examObj.wrongs.find(w => w.q === q.q)) examObj.wrongs.push(q);
-            }
-            document.getElementById('feedback').classList.remove('hidden');
-        }
-
-        function nextQ() { curIdx++; if(curIdx < testList.length) updateQ(); else finishTest(); }
-
-        // 테스트 종료 연출 강화 (100점 연출 및 노력 중심 메타칭찬)
-        function finishTest() {
-            const finalScore = Math.round((score / testList.length) * 100);
-            document.getElementById('score-circle').innerText = finalScore;
-            
-            const perfectBadge = document.getElementById('perfect-badge');
-            const starAlert = document.getElementById('star-gain-alert');
-            
-            let msg = "";
-            if(finalScore === 100) {
-                // 1. 실시간 별 누적
-                db.stars = (db.stars || 0) + 1;
-                updateStarUI();
-                saveStarsOnly(); // 백그라운드로 안전하게 별 수량 실시간 동기화
-                
-                perfectBadge.classList.remove('hidden');
-                starAlert.classList.remove('hidden');
-                
-                // 2. 노력과 집중력 중심의 칭찬 문구 교체
-                msg = "🎉 每一分耕耘都有最耀眼的收穫！\n看到你今天這麼認真複習、專注耐心地作答，秀彬教練真的為你感到無比驕傲！\n你用「堅持不懈」的努力證明了自己的實力，這份持續進步的「專注與毅力」才是你身上最閃閃發光的寶藏！❤️";
-                
-                // 화려한 컨페티 폭죽 시작!
-                confetti({ particleCount: 150, spread: 75, origin: { y: 0.6 } });
-            } else {
-                perfectBadge.classList.add('hidden');
-                starAlert.classList.add('hidden');
-                
-                if(finalScore >= 80) {
-                    msg = "👏 非常優秀！離滿分只差一點點了！\n你今天的專注和細心表現得超級棒，相信下一次只要再多看一眼題目，你一定能達成目標！加油！";
-                } else if(finalScore >= 50) {
-                    msg = "💪 不錯喔！已經穩穩掌握了一半以上！\n看到你在作答過程中非常認真努力地思考，這就是實力正在迅速累積的最好證明！我們一起繼續前進！";
-                } else {
-                    msg = "🌱 沒關係，努力的過程遠比分數更具價值！\n今天錯過的地方，都將變成你明天進步的養分。回去跟著秀彬教練多複習幾次重點，下次的你一定會比今天更強大！";
-                }
-            }
-            document.getElementById('score-msg').innerText = msg;
-            document.getElementById('result-overlay').classList.remove('hidden');
-        }
-
-        function closeResult() { document.getElementById('result-overlay').classList.add('hidden'); showHome(); }
+    // 後台：儲存資料並與學生端同步
+    function saveExams() {
+        pastExamsData = []; // 初始化清空
+        const formBoxes = document.querySelectorAll('.exam-form-box');
         
-        function showPage(id) {
-            ['page-grades', 'page-subjects', 'page-semesters', 'page-exams', 'page-home', 'page-summary', 'page-test'].forEach(p => {
-                document.getElementById(p).classList.add('hidden');
-            });
-            document.getElementById(id).classList.remove('hidden'); window.scrollTo(0,0);
-        }
-
-        // 틀린 문제 복습방 작동기
-        function startReview() { 
-            const examObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
-            if(!examObj.wrongs?.length) return alert("這個範疇沒有錯題紀錄喔！"); 
+        formBoxes.forEach((box, index) => {
+            const publisher = box.querySelector('.input-publisher').value || '未指定出版社';
+            const schoolName = box.querySelector('.input-school').value || '未指定學校';
+            const content = box.querySelector('.input-content').value || '尚無題目內容。';
             
-            testList = [...examObj.wrongs].sort(() => Math.random() - 0.5); 
-            curIdx = 0; score = 0; updateQ(); showPage('page-test'); 
-        }
-
-        // 오직 별만 백그라운드로 소리 없이 동기화하는 보안 저장장치
-        async function saveStarsOnly() {
-            try {
-                await fetch(API_URL, {
-                    method: 'PUT',
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
-                    body: JSON.stringify(db)
-                });
-            } catch (e) {
-                console.error("별 수량 자동 저장에 실패했습니다.", e);
-            }
-        }
-
-
-        // ================== [관리자 화면: 백오피스 인터페이스 및 보강 컨트롤] ==================
-
-        function checkPassword() {
-            const p = prompt("請輸入後台管理密碼:");
-            if (p === ADMIN_PASS) toggleAdmin();
-            else if (p !== null) alert("❌ 密碼錯誤！");
-        }
-
-        function toggleAdmin() { 
-            const adminPage = document.getElementById('page-admin');
-            adminPage.classList.toggle('hidden'); 
-            if(!adminPage.classList.contains('hidden')) {
-                document.getElementById('admin-stars-count').value = db.stars || 0;
-            }
-        }
-
-        // 백오피스 학년 버튼 동적 생성
-        function buildAdminGradeButtons() {
-            const cont = document.getElementById('admin-grade-select');
-            cont.innerHTML = '';
-            gradeList.forEach(g => {
-                const btn = document.createElement('button');
-                btn.className = "border p-2 rounded text-xs bg-white transition-colors";
-                btn.id = `ad-grade-${g}`;
-                btn.innerText = `${g}年級`;
-                btn.onclick = () => adminSetGrade(g);
-                cont.appendChild(btn);
+            pastExamsData.push({
+                id: `exam_${Date.now()}_${index}`,
+                publisher: publisher,
+                schoolName: schoolName,
+                content: content
             });
+        });
+
+        alert("✅ 系統已成功儲存！\n請切換至「秀彬老師的課堂」分頁確認學生畫面。");
+        renderStudentList(); 
+    }
+
+    // 學生端：渲染試卷清單
+    function renderStudentList() {
+        const container = document.getElementById('student-list-container');
+        container.innerHTML = ''; 
+
+        if(pastExamsData.length === 0) {
+            container.innerHTML = '<p style="color:#777; text-align:center;">目前尚未登錄任何考古題。請媽媽先在管理後台新增試卷喔！</p>';
+            return;
         }
 
-        // 백오피스 과목 버튼 동적 생성
-        function buildAdminSubButtons() {
-            const cont = document.getElementById('admin-sub-select');
-            cont.innerHTML = '';
-            subjectList.forEach(s => {
-                const btn = document.createElement('button');
-                btn.className = "border p-1 rounded text-xs bg-white transition-colors";
-                btn.id = `ad-sub-${s}`;
-                btn.innerText = s;
-                btn.onclick = () => adminSetSub(s);
-                cont.appendChild(btn);
-            });
-        }
+        pastExamsData.forEach(exam => {
+            const card = document.createElement('div');
+            card.className = 'exam-card';
+            card.innerHTML = `
+                <div class="exam-info">
+                    <h3>📄 [${exam.publisher} - ${exam.schoolName}]</h3>
+                    <span style="font-size:14px; color:#666;">實戰歷屆模擬試卷清單</span>
+                </div>
+                <button class="btn-action" onclick="startTest('${exam.id}')">開始測驗</button>
+            `;
+            container.appendChild(card);
+        });
+    }
 
-        // 백오피스 학년 선택 핸들러
-        function adminSetGrade(g) {
-            adGrade = g;
-            gradeList.forEach(item => document.getElementById(`ad-grade-${item}`).classList.remove('admin-select-active'));
-            document.getElementById(`ad-grade-${g}`).classList.add('admin-select-active');
-            updateAdminPanelFlow();
-        }
+    // 學生端：進入特定學校試卷測驗
+    function startTest(examId) {
+        const exam = pastExamsData.find(e => e.id === examId);
+        if(!exam) return;
 
-        // 백오피스 과목 선택 핸들러
-        function adminSetSub(s) {
-            adSub = s;
-            subjectList.forEach(item => document.getElementById(`ad-sub-${item}`).classList.remove('admin-select-active'));
-            document.getElementById(`ad-sub-${s}`).classList.add('admin-select-active');
-            updateAdminPanelFlow();
-        }
+        // 動態變更秀彬老師的主題標題
+        document.getElementById('test-title').innerText = `[${exam.publisher} - ${exam.schoolName}] 模擬測驗`;
+        document.getElementById('test-content-area').innerText = exam.content;
 
-        // 백오피스 학기 선택 핸들러
-        function adminSetSem(sem) {
-            adSem = sem;
-            semesterList.forEach(item => document.getElementById(`ad-sem-${item}`).classList.remove('admin-select-active'));
-            document.getElementById(`ad-sem-${sem}`).classList.add('admin-select-active');
-            updateAdminPanelFlow();
-        }
+        // 切換至測驗畫面
+        switchView('test-view');
+    }
 
-        // 백오피스 시험 선택 핸들러
-        function adminSetExam(ex) {
-            adExam = ex;
-            examList.forEach(item => document.getElementById(`ad-exam-${item}`).classList.remove('admin-select-active'));
-            document.getElementById(`ad-exam-${ex}`).classList.add('admin-select-active');
-            updateAdminPanelFlow();
-        }
+    // 頁面切換工具
+    function switchView(viewId) {
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
 
-        // 선택 진행 상태에 따른 실시간 관리 영역 노출 분기 처리
-        function updateAdminPanelFlow() {
-            if(!adGrade || !adSub || !adSem || !adExam) {
-                document.getElementById('admin-main-area').classList.add('hidden');
-                return;
-            }
-
-            // 모든 차원이 완벽히 선택되었을 시 영역 노출
-            document.getElementById('admin-main-area').classList.remove('hidden');
-
-            // 1. 라벨 및 텍스트 데이터 매핑
-            document.getElementById('admin-label-grade-img').innerText = `🖼️ [${adGrade}年級] 메인 페이지 사진`;
-            document.getElementById('admin-input-grade-img').value = db.grades[adGrade].mainImg || '';
-
-            document.getElementById('admin-label-sub-img').innerText = `🖼️ [${adGrade}年級 - ${adSub}] 과목 사진`;
-            document.getElementById('admin-input-sub-img').value = db.grades[adGrade].subjects[adSub].mainImg || '';
-
-            document.getElementById('admin-label-sem-img').innerText = `🖼️ [${adGrade}年級 - ${adSub} - ${adSem}] 학기 사진`;
-            document.getElementById('admin-input-sem-img').value = db.grades[adGrade].subjects[adSub].semesters[adSem].mainImg || '';
-
-            document.getElementById('admin-label-exam-img').innerText = `🖼️ [${adGrade}年級 - ${adSub} - ${adSem} - ${adExam}] 시험 사진`;
-            document.getElementById('admin-input-exam-img').value = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg || '';
-
-            // 2. 단원 관리 렌더링
-            renderAdminUnits();
-        }
-
-        function renderAdminUnits() {
-            const cont = document.getElementById('admin-unit-list');
-            cont.innerHTML = '';
-            
-            const examObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
-            const units = examObj.units || [];
-
-            units.forEach((u, i) => {
-                const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-white border rounded-xl mb-2 shadow-sm";
-                div.innerHTML = `
-                    <span class="font-bold text-gray-700 text-xs">${u.name}</span>
-                    <div class="space-x-2 text-xs">
-                        <button onclick="openEdit(${i})" class="text-blue-500 font-bold">編輯</button>
-                        <button onclick="deleteUnit(${i})" class="text-red-400 font-bold">刪除</button>
-                    </div>
-                `;
-                cont.appendChild(div);
-            });
-        }
-
-        function addUnitRow() {
-            const n = prompt("請輸入新增單元名稱:");
-            if(n) {
-                const examObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
-                if(!examObj.units) examObj.units = [];
-                examObj.units.push({ name: n, summary: '', questions: [], unitImg: '' });
-                renderAdminUnits();
+        if(viewId === 'admin-view' || viewId === 'student-list-view') {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(viewId === 'admin-view') document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            if(viewId === 'student-list-view') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                renderStudentList(); 
             }
         }
+    }
+</script>
 
-        function openEdit(i) {
-            curUnitIdx = i;
-            const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[i];
-            
-            document.getElementById('editing-unit-name').innerText = u.name;
-            document.getElementById('admin-unit-img-url').value = u.unitImg || '';
-            document.getElementById('admin-summary').value = u.summary || '';
-            document.getElementById('admin-questions').value = JSON.stringify(u.questions || [], null, 2);
-            document.getElementById('edit-area').classList.remove('hidden');
-        }
-
-        function applyUnitEdit() {
-            try {
-                const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[curUnitIdx];
-                u.unitImg = document.getElementById('admin-unit-img-url').value.trim();
-                u.summary = document.getElementById('admin-summary').value;
-                u.questions = JSON.parse(document.getElementById('admin-questions').value);
-                
-                alert("暫存成功！"); 
-                document.getElementById('edit-area').classList.add('hidden');
-                renderAdminUnits();
-            } catch(e) { 
-                alert("JSON 語法格式錯誤，請確認符號！"); 
-            }
-        }
-
-        function deleteUnit(i) {
-            if(confirm("確定要刪除此單元嗎？")) {
-                db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units.splice(i, 1);
-                renderAdminUnits();
-                document.getElementById('edit-area').classList.add('hidden');
-            }
-        }
-
-        // 최종 영구 저장 (클라우드 연동 저장)
-        async function saveToCloud() {
-            const btn = document.getElementById('final-save-btn');
-            btn.innerText = "⏳ 儲存同步中...";
-            try {
-                // 1. 공통 환경변수 보정 및 복사
-                db.appMainImg = document.getElementById('admin-app-img-url').value.trim();
-                db.stars = parseInt(document.getElementById('admin-stars-count').value) || 0;
-                db.settings.imgEnabled = document.getElementById('img-toggle').checked;
-                
-                // 2. 실시간 선택 이미지 필드 할당
-                if(adGrade && adSub && adSem && adExam) {
-                    db.grades[adGrade].mainImg = document.getElementById('admin-input-grade-img').value.trim();
-                    db.grades[adGrade].subjects[adSub].mainImg = document.getElementById('admin-input-sub-img').value.trim();
-                    db.grades[adGrade].subjects[adSub].semesters[adSem].mainImg = document.getElementById('admin-input-sem-img').value.trim();
-                    db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg = document.getElementById('admin-input-exam-img').value.trim();
-                }
-
-                // 3. 서버 전송
-                await fetch(API_URL, {
-                    method: 'PUT',
-                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
-                    body: JSON.stringify(db)
-                });
-                alert("✅ 雲端儲存成功！網頁將自動重新載入。"); 
-                location.reload();
-            } catch (e) { 
-                alert("❌ 雲端儲存失敗"); 
-                btn.innerText = "💾 儲存並同步至雲端";
-            }
-        }
-    </script>
 </body>
 </html>
-
-
-            
