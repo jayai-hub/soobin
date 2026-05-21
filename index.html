@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 수제비 선생님 공부방 V28</title>
+    <title>✨ 수제비 선생님의 공부방 V27.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -31,6 +31,17 @@
 </head>
 <body onload="loadFromCloud()">
     
+    <!-- 🏠 同步中遮罩 (新增 4秒 逾時強制跳過機制) -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-4">
+        <div class="animate-spin text-4xl text-pink-500 mb-4"><i class="fa-solid fa-circle-notch"></i></div>
+        <p class="text-pink-500 font-bold">同步中 / 데이터 동기화 중...</p>
+        <p id="loading-error" class="text-amber-500 text-xs mt-2 hidden max-w-xs text-center font-bold"></p>
+        <button id="loading-skip-btn" onclick="skipCloudSync()" class="mt-4 px-4 py-2 bg-pink-100 hover:bg-pink-200 text-pink-600 text-xs font-bold rounded-xl shadow-sm hidden">
+            ⚠️ 點此直接進入系統 (오프라인 진입)
+        </button>
+    </div>
+
+    <!-- 導覽列 -->
     <nav class="p-4 flex justify-between items-center max-w-4xl mx-auto">
         <h1 class="text-xl font-bold text-pink-500 flex items-center gap-2" onclick="goHomeFirstPage()" style="cursor:pointer">
             ✨ 수제비 선생님
@@ -47,11 +58,7 @@
         </div>
     </nav>
 
-    <div id="loading-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center">
-        <div class="animate-spin text-4xl text-pink-500 mb-4"><i class="fa-solid fa-circle-notch"></i></div>
-        <p class="text-pink-500 font-bold">同步中...</p>
-    </div>
-
+    <!-- 測驗結果彈窗 -->
     <div id="result-overlay" class="result-card hidden">
         <h2 class="text-3xl font-bold text-pink-600 mb-2">測試結束！</h2>
         <div class="relative my-4">
@@ -71,12 +78,14 @@
 
     <main class="max-w-4xl mx-auto px-4 md:px-6 pb-20">
         
+        <!-- 年級選擇 -->
         <section id="page-grades" class="max-w-md mx-auto">
             <div id="app-img-container" class="mb-4"></div>
             <div class="soobin-bubble">"今天也要跟我一起加油學習喔！🌱<br>目前我們已經累積了 <span id="welcome-stars" class="text-amber-500 font-black">0</span> 顆奮鬥之星囉！<br>今天想先看哪個年級呢？"</div>
             <div class="grid grid-cols-2 gap-4" id="grade-buttons-container"></div>
         </section>
 
+        <!-- 科目選擇 -->
         <section id="page-subjects" class="hidden max-w-md mx-auto">
             <div id="grade-img-container" class="mb-4"></div>
             <button onclick="showPage('page-grades')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回年級選擇</button>
@@ -84,6 +93,7 @@
             <div class="grid grid-cols-2 gap-4" id="subject-buttons-container"></div>
         </section>
 
+        <!-- 學期選擇 -->
         <section id="page-semesters" class="hidden max-w-md mx-auto">
             <div id="subject-img-container" class="mb-4"></div>
             <button onclick="showPage('page-subjects')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回科目選擇</button>
@@ -94,6 +104,7 @@
             </div>
         </section>
 
+        <!-- 段考選擇 -->
         <section id="page-exams" class="hidden max-w-md mx-auto">
             <div id="semester-img-container" class="mb-4"></div>
             <button onclick="showPage('page-semesters')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回學期選擇</button>
@@ -105,6 +116,7 @@
             </div>
         </section>
 
+        <!-- 單元與考古題並列大本營 -->
         <section id="page-home" class="hidden">
             <div class="text-center max-w-md mx-auto">
                 <div id="sub-img-container" class="mb-4"></div>
@@ -113,7 +125,7 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                
+                <!-- 左側：單元管理 -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-pink-100 flex flex-col">
                     <div class="border-b-2 border-pink-50 pb-3 mb-5">
                         <h3 class="text-xl font-bold text-pink-600 flex items-center gap-2">
@@ -124,6 +136,7 @@
                     <div id="unit-list-container" class="space-y-3 flex-1"></div>
                 </div>
 
+                <!-- 右側：歷屆考古題 -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-purple-100 flex flex-col">
                     <div class="border-b-2 border-purple-50 pb-3 mb-5">
                         <h3 class="text-xl font-bold text-purple-600 flex items-center gap-2">
@@ -138,4 +151,812 @@
             <div class="grid grid-cols-2 gap-4 mt-8 max-w-md mx-auto">
                 <button onclick="startReview('normal')" class="glass p-4 text-left border-2 border-pink-200 hover:bg-pink-50 transition-colors">
                     <div class="text-sm font-bold text-pink-600 mb-1">📒 診斷錯題本</div>
-                    <p id="review
+                    <p id="review-count" class="text-lg font-black text-slate-700">0 題</p>
+                </button>
+                <button onclick="startReview('exam')" class="glass p-4 text-left border-2 border-purple-200 hover:bg-purple-50 transition-colors">
+                    <div class="text-sm font-bold text-purple-600 mb-1">📝 考古題錯題本</div>
+                    <p id="exam-review-count" class="text-lg font-black text-slate-700">0 題</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- 第一階段：觀念要點 -->
+        <section id="page-summary" class="hidden space-y-4 max-w-md mx-auto">
+            <div id="unit-summary-img-container" class="mb-4"></div>
+            <div class="glass p-6 border-2 border-pink-100">
+                <div class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-1">第一階段：觀念理解</div>
+                <h2 id="summary-title" class="text-xl font-bold mb-4 text-pink-600 border-b pb-2"></h2>
+                <div id="summary-text" class="summary-box text-gray-700"></div>
+            </div>
+            <button onclick="startTestFlow('normal')" class="btn-primary w-full py-4 font-bold text-lg shadow-md hover:scale-[1.01] transition-all">💡 概念複習完畢，進階自我診斷！</button>
+            <button onclick="showPage('page-home')" class="w-full text-center text-gray-400 text-sm underline mt-2">返回單元列表</button>
+        </section>
+
+        <!-- 核心測驗引擎 -->
+        <section id="page-test" class="hidden max-w-md mx-auto">
+            <div id="unit-test-img-container" class="mb-4"></div>
+            <div class="mb-4 text-xs flex justify-between items-center bg-white p-3 rounded-full shadow-sm border border-gray-100">
+                <button onclick="if(confirm('確定要結束目前的測驗嗎？')) showHome()" class="bg-gray-100 hover:bg-gray-200 px-4 py-1.5 rounded-full font-bold text-gray-500 transition-colors">✕ 停止</button>
+                <span id="test-mode-badge" class="px-3 py-1 rounded-full font-bold text-xs"></span>
+                <span id="test-progress" class="font-bold text-gray-600 text-sm mr-2"></span>
+            </div>
+            <div class="glass p-6 min-h-[300px] border-2 border-pink-100">
+                <div id="test-paper-header-tag" class="text-xs font-bold text-white bg-purple-500 inline-block px-3 py-1 rounded-md mb-4 hidden"></div>
+                <h3 id="q-text" class="text-lg font-bold mb-6 text-gray-800 leading-relaxed"></h3>
+                <div id="options" class="space-y-3"></div>
+                <div id="feedback" class="hidden mt-6 p-5 bg-pink-50 rounded-2xl border border-pink-100">
+                    <p id="feedback-text" class="text-sm font-bold text-gray-700 mb-4 whitespace-pre-line leading-relaxed"></p>
+                    <button onclick="nextQ()" class="w-full py-3 btn-primary font-bold shadow-sm">下一題</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 智慧後台 -->
+        <section id="page-admin" class="hidden fixed inset-0 bg-white z-[300] p-4 md:p-6 overflow-y-auto">
+            <div class="max-w-2xl mx-auto">
+                <div class="flex justify-between items-center border-b pb-4 mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V27.1 雙軌穩定版)</h2>
+                    <button onclick="toggleAdmin()" class="text-3xl text-gray-400 hover:text-pink-500">&times;</button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <p class="font-bold text-sm text-gray-700">啟用圖片功能</p>
+                        <label class="switch"><input type="checkbox" id="img-toggle" onchange="db.settings.imgEnabled = this.checked"><span class="slider"></span></label>
+                    </div>
+                    
+                    <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                        <p class="text-xs font-bold text-yellow-700 mb-2">⭐ 奮鬥之星數量管理</p>
+                        <input type="number" id="admin-stars-count" class="w-full p-2 text-xs border rounded font-bold" min="0">
+                    </div>
+
+                    <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                        <p class="text-xs font-bold text-purple-600 mb-2">🏠 App 第一頁照片網址</p>
+                        <input type="text" id="admin-app-img-url" class="w-full p-2 text-xs border rounded">
+                    </div>
+
+                    <div class="border p-5 rounded-2xl bg-white shadow-sm space-y-4">
+                        <h3 class="text-sm font-bold text-pink-600 border-b pb-2">🎯 請依序選擇欲配置的範圍</h3>
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 mb-2">1. 選擇年級</p>
+                            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="admin-grade-select"></div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 mb-2">2. 選擇科目</p>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="admin-sub-select"></div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 mb-2">3. 選擇學期</p>
+                            <div class="grid grid-cols-2 gap-2" id="admin-sem-select">
+                                <button onclick="adminSetSem('上學期')" id="ad-sem-上學期" class="border border-gray-200 p-2 rounded-lg text-xs bg-gray-50 hover:bg-gray-100 font-bold text-gray-600">上學期</button>
+                                <button onclick="adminSetSem('下學期')" id="ad-sem-下學期" class="border border-gray-200 p-2 rounded-lg text-xs bg-gray-50 hover:bg-gray-100 font-bold text-gray-600">下學期</button>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-500 mb-2">4. 選擇段考</p>
+                            <div class="grid grid-cols-3 gap-2" id="admin-exam-select">
+                                <button onclick="adminSetExam('第一段考')" id="ad-exam-第一段考" class="border border-gray-200 p-2 rounded-lg text-xs bg-gray-50 hover:bg-gray-100 font-bold text-gray-600">第一段考</button>
+                                <button onclick="adminSetExam('第二段考')" id="ad-exam-第二段考" class="border border-gray-200 p-2 rounded-lg text-xs bg-gray-50 hover:bg-gray-100 font-bold text-gray-600">第二段考</button>
+                                <button onclick="adminSetExam('第三段考')" id="ad-exam-第三段考" class="border border-gray-200 p-2 rounded-lg text-xs bg-gray-50 hover:bg-gray-100 font-bold text-gray-600">第三段考</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="admin-main-area" class="hidden space-y-8">
+                        <div class="bg-red-50 p-5 rounded-2xl border border-red-200 space-y-3">
+                            <h4 class="font-bold text-sm text-red-700 flex items-center gap-2">
+                                <i class="fa-solid fa-trash-can"></i> 該範圍 錯題本快速初始化
+                            </h4>
+                            <p class="text-xs text-gray-600 leading-relaxed">
+                                目前選定：<span id="admin-reset-scope-text" class="font-bold text-red-600 bg-white px-2 py-0.5 rounded"></span>
+                            </p>
+                            <div class="grid grid-cols-2 gap-2 pt-2">
+                                <button onclick="resetSelectedScopeWrongs('normal')" class="bg-white border border-red-300 text-red-600 font-bold py-2.5 rounded-xl text-xs hover:bg-red-100 transition-colors shadow-sm">
+                                    清空單元錯題 (<span id="admin-cnt-normal-wrong">0</span>)
+                                </button>
+                                <button onclick="resetSelectedScopeWrongs('exam')" class="bg-white border border-purple-300 text-purple-600 font-bold py-2.5 rounded-xl text-xs hover:bg-purple-100 transition-colors shadow-sm">
+                                    清空考古錯題 (<span id="admin-cnt-exam-wrong">0</span>)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100 space-y-3">
+                            <h4 class="font-bold text-sm text-blue-700 mb-3">🖼️ 各層級 圖片網址配置</h4>
+                            <div><p id="admin-label-grade-img" class="text-xs text-gray-600 mb-1 font-bold"></p><input type="text" id="admin-input-grade-img" class="w-full p-2.5 text-xs border rounded-xl"></div>
+                            <div><p id="admin-label-sub-img" class="text-xs text-gray-600 mb-1 font-bold"></p><input type="text" id="admin-input-sub-img" class="w-full p-2.5 text-xs border rounded-xl"></div>
+                            <div><p id="admin-label-sem-img" class="text-xs text-gray-600 mb-1 font-bold"></p><input type="text" id="admin-input-sem-img" class="w-full p-2.5 text-xs border rounded-xl"></div>
+                            <div><p id="admin-label-exam-img" class="text-xs text-gray-600 mb-1 font-bold"></p><input type="text" id="admin-input-exam-img" class="w-full p-2.5 text-xs border rounded-xl"></div>
+                        </div>
+
+                        <div class="bg-purple-50 p-5 rounded-2xl border-2 border-purple-200 space-y-4">
+                            <label class="block text-base font-bold text-purple-700 flex items-center gap-2">
+                                <i class="fa-solid fa-layer-group"></i> 歷屆考古題 新增與管理
+                            </label>
+                            <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-purple-100 shadow-sm">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">出版社</label>
+                                    <input type="text" id="input-paper-publisher" class="w-full p-2 text-xs border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" placeholder="例: 翰林">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">學年度</label>
+                                    <input type="text" id="input-paper-year" class="w-full p-2 text-xs border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" placeholder="例: 112">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 mb-1">學校名稱</label>
+                                    <input type="text" id="input-paper-school" class="w-full p-2 text-xs border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" placeholder="例: 景美國中">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-purple-600 mb-2">歷屆考古題 JSON Array</label>
+                                <textarea id="input-paper-json" class="w-full h-32 p-3 text-xs border rounded-xl font-mono bg-white focus:ring-2 focus:ring-purple-400 outline-none shadow-inner" placeholder="[{'q':'題目', 'a':['A','B'], 'correct':0, 'msg':'解析'}]"></textarea>
+                            </div>
+                            <button onclick="savePaperDraftToExam()" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl shadow-md transition-colors">
+                                ➕ 新增此試卷到本範圍
+                            </button>
+                            <div class="mt-4 border-t border-purple-200 pt-4">
+                                <h4 class="font-bold text-xs text-purple-800 mb-2">已儲存的試卷清單：</h4>
+                                <div id="admin-papers-list-container" class="space-y-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border-2 border-pink-100 shadow-sm">
+                            <h3 class="font-bold text-base text-pink-700 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-folder-open"></i> 單元內容管理
+                            </h3>
+                            <div id="admin-unit-list" class="space-y-2 mb-3"></div>
+                            <button onclick="addUnitRow()" class="w-full py-3 border-2 border-dashed border-pink-300 text-pink-500 bg-pink-50 hover:bg-pink-100 font-bold rounded-xl transition-colors">
+                                + 新增單元
+                            </button>
+                        </div>
+
+                        <div id="edit-area" class="hidden bg-white p-5 rounded-2xl border-2 border-pink-300 shadow-lg space-y-4">
+                            <h3 class="font-bold text-gray-800 border-b-2 border-pink-100 pb-3">編輯單元: <span id="editing-unit-name" class="text-pink-600"></span></h3>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-1">單元代表圖片網址</label>
+                                <input type="text" id="admin-unit-img-url" class="w-full p-2.5 text-xs border rounded-xl outline-none focus:ring-2 focus:ring-pink-300" placeholder="圖片網址">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-pink-600 mb-2">1️⃣ 觀念重點整理 (純文字)</label>
+                                <textarea id="admin-summary" class="w-full h-32 p-3 text-xs border rounded-xl outline-none focus:ring-2 focus:ring-pink-300 bg-gray-50 focus:bg-white" placeholder="請輸入重點內容..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-blue-600 mb-2">2️⃣ 單元測驗題 (JSON Array)</label>
+                                <textarea id="admin-questions" class="w-full h-32 p-3 text-xs border rounded-xl font-mono outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50 focus:bg-white" placeholder="[{'q': '題目', 'a':['選項1','選項2'], 'correct':0, 'msg':'解析'}]"></textarea>
+                            </div>
+                            <button onclick="applyUnitEdit()" class="w-full py-4 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-xl shadow-lg text-sm transition-colors mt-4">
+                                確認單元編輯並暫存
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="final-save-btn" onclick="saveToCloud()" class="w-full py-5 bg-gray-800 hover:bg-black text-white font-bold rounded-2xl shadow-xl text-lg mt-10 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> 💾 儲存所有變更並同步至雲端
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const BIN_ID = "6a005e56adc21f119a7c1f86";
+        const MASTER_KEY = "$2a$10$0IMIZdF3/BKscfzxvO6MuepHI4f3d2VXiIus8mfSCo1FIPXoZVFQ.";
+        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        const ADMIN_PASS = "1234";
+
+        const gradeList = ["7", "8", "9", "10", "11", "12"];
+        const subjectList = ["自然", "數學", "英文", "國文", "歷史", "地理", "公民", "社會"];
+        const semesterList = ["上學期", "下學期"];
+        const examList = ["第一段考", "第二段考", "第三段考"];
+
+        let db = { settings: { imgEnabled: true }, appMainImg: '', stars: 0, grades: {} };
+
+        let curGrade = '', curSub = '', curSem = '', curExam = '', curUnitIdx = -1;
+        let testList = [], curIdx = 0, score = 0, currentRunningMode = 'normal'; 
+        let adGrade = '', adSub = '', adSem = '', adExam = '';
+
+        async function loadFromCloud() {
+            // 🚨 안전 타이머: 4초 동안 동기화가 끝나지 않으면 강제 오프라인 진입 활성화
+            const timeoutId = setTimeout(() => {
+                console.warn("Cloud sync timeout. Activating fallback.");
+                const errText = document.getElementById('loading-error');
+                if (errText) {
+                    errText.innerText = "⚠️ 網路連線較慢，您可以點擊下方按鈕以本地模式開啟。 (연결이 지연되어 오프라인 모드가 활성화되었습니다.)";
+                    errText.classList.remove('hidden');
+                }
+                const skipBtn = document.getElementById('loading-skip-btn');
+                if (skipBtn) skipBtn.classList.remove('hidden');
+            }, 4000);
+
+            try {
+                const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY } });
+                if (!res.ok) throw new Error("Network response was not ok");
+                const data = await res.json();
+                db = data.record || db;
+                
+                clearTimeout(timeoutId);
+                finishInitialization();
+            } catch (e) {
+                clearTimeout(timeoutId);
+                console.error("Sync Failed:", e);
+                // 에러 발생 시 완전 먹통 방지를 위해 빈 데이터 구조로 강제 진입 유도
+                document.getElementById('loading-error').innerText = "⚠️ 讀取失敗，已自動開啟預設系統。";
+                document.getElementById('loading-error').classList.remove('hidden');
+                document.getElementById('loading-skip-btn').classList.remove('hidden');
+                
+                // 1초 후 자동 강제 진입
+                setTimeout(() => { skipCloudSync(); }, 1000);
+            }
+        }
+
+        function skipCloudSync() {
+            console.log("Forced skipping cloud sync.");
+            finishInitialization();
+        }
+
+        function finishInitialization() {
+            initDBStructure();
+            updateStarUI();
+
+            if(document.getElementById('img-toggle')) document.getElementById('img-toggle').checked = db.settings?.imgEnabled ?? true;
+            if(document.getElementById('admin-app-img-url')) document.getElementById('admin-app-img-url').value = db.appMainImg || '';
+            
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.classList.add('hidden');
+            
+            buildGradeButtons();
+            buildAdminGradeButtons();
+            buildAdminSubButtons();
+
+            showPage('page-grades');
+            renderAppImg();
+        }
+
+        // 🚨 낡은 데이터 호환성을 위한 철저한 다중 Null-Safe 초기화 구조
+        function initDBStructure() {
+            db.stars = db.stars || 0;
+            if(!db.settings) db.settings = { imgEnabled: true };
+            if(!db.grades) db.grades = {};
+
+            gradeList.forEach(g => {
+                if(!db.grades[g]) db.grades[g] = { mainImg: '', subjects: {} };
+                if(!db.grades[g].subjects) db.grades[g].subjects = {};
+                
+                subjectList.forEach(s => {
+                    if(!db.grades[g].subjects[s]) db.grades[g].subjects[s] = { mainImg: '', semesters: {} };
+                    if(!db.grades[g].subjects[s].semesters) db.grades[g].subjects[s].semesters = {};
+                    
+                    semesterList.forEach(sem => {
+                        if(!db.grades[g].subjects[s].semesters[sem]) db.grades[g].subjects[s].semesters[sem] = { mainImg: '', exams: {} };
+                        if(!db.grades[g].subjects[s].semesters[sem].exams) db.grades[g].subjects[s].semesters[sem].exams = {};
+                        
+                        examList.forEach(ex => {
+                            if(!db.grades[g].subjects[s].semesters[sem].exams[ex]) {
+                                db.grades[g].subjects[s].semesters[sem].exams[ex] = {
+                                    mainImg: '', units: [], wrongs: [], examWrongs: [], examPapers: [] 
+                                };
+                            }
+                            const eObj = db.grades[g].subjects[s].semesters[sem].exams[ex];
+                            if(!eObj.units) eObj.units = [];
+                            if(!eObj.wrongs) eObj.wrongs = [];
+                            if(!eObj.examWrongs) eObj.examWrongs = [];
+                            if(!eObj.examPapers) eObj.examPapers = []; 
+                        });
+                    });
+                });
+            });
+        }
+
+        function showPage(pid) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(pid).classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function updateStarUI() {
+            if(document.getElementById('nav-stars')) document.getElementById('nav-stars').innerText = db.stars;
+            if(document.getElementById('welcome-stars')) document.getElementById('welcome-stars').innerText = db.stars;
+        }
+
+        function createImgTag(url) {
+            if(!url || url.trim() === "") return "";
+            return `<img src="${url.trim()}" class="fit-img shadow-md border border-gray-100" onerror="this.style.display='none'">`;
+        }
+
+        function renderAppImg() {
+            const isImgOn = db.settings?.imgEnabled;
+            document.getElementById('app-img-container').innerHTML = isImgOn ? createImgTag(db.appMainImg) : '';
+        }
+
+        function buildGradeButtons() {
+            const container = document.getElementById('grade-buttons-container');
+            container.innerHTML = '';
+            gradeList.forEach(g => {
+                const b = document.createElement('button');
+                b.className = "grid-btn text-pink-600 border-pink-200";
+                b.innerText = `${g} 年級`;
+                b.onclick = () => selectGrade(g);
+                container.appendChild(b);
+            });
+        }
+
+        function selectGrade(g) {
+            curGrade = g;
+            document.getElementById('grade-title').innerText = `✨ ${g} 年級`;
+            document.getElementById('grade-img-container').innerHTML = db.settings?.imgEnabled ? createImgTag(db.grades[g]?.mainImg || '') : '';
+            buildSubjectButtons();
+            showPage('page-subjects');
+        }
+
+        function buildSubjectButtons() {
+            const container = document.getElementById('subject-buttons-container');
+            container.innerHTML = '';
+            subjectList.forEach(s => {
+                const b = document.createElement('button');
+                b.className = "grid-btn text-gray-700";
+                let icon = "📚";
+                if (s === "數學") icon = "📐"; if (s === "英文") icon = "🔤"; if (s === "國文") icon = "📖"; if (s === "自然") icon = "🌱";
+                if (s === "歷史") icon = "⏳"; if (s === "地理") icon = "🌍"; if (s === "公民") icon = "⚖️"; if (s === "社會") icon = "👥";
+                b.innerText = `${icon} ${s}`;
+                b.onclick = () => selectSubject(s);
+                container.appendChild(b);
+            });
+        }
+
+        function selectSubject(s) {
+            curSub = s;
+            document.getElementById('subject-title').innerText = `✨ ${curGrade} 年級 - ${curSub}`;
+            document.getElementById('subject-img-container').innerHTML = db.settings?.imgEnabled ? createImgTag(db.grades[curGrade]?.subjects[s]?.mainImg || '') : '';
+            showPage('page-semesters');
+        }
+
+        function selectSemester(sem) {
+            curSem = sem;
+            document.getElementById('semester-title').innerText = `✨ ${curGrade}年級 ${curSub} (${curSem})`;
+            document.getElementById('semester-img-container').innerHTML = db.settings?.imgEnabled ? createImgTag(db.grades[curGrade]?.subjects[curSub]?.semesters[sem]?.mainImg || '') : '';
+            showPage('page-exams');
+        }
+
+        function selectExam(ex) { 
+            curExam = ex; 
+            showHome(); 
+        }
+
+        function showHome() {
+            document.getElementById('welcome-msg').innerText = `${curGrade}年級 ${curSub} - ${curSem} [${curExam}]`;
+            const eObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
+            
+            document.getElementById('sub-img-container').innerHTML = db.settings?.imgEnabled ? createImgTag(eObj.mainImg) : '';
+            
+            const listCont = document.getElementById('unit-list-container');
+            listCont.innerHTML = '';
+            (eObj.units || []).forEach((u, i) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 text-left font-bold bg-[#FFF5F7] rounded-xl shadow-sm hover:bg-[#FFEDF0] border border-pink-100 transition-colors text-pink-700 flex items-center gap-2";
+                btn.innerHTML = `<i class="fa-solid fa-book-open text-pink-400"></i> <span class="flex-1">${u.name}</span>`;
+                btn.onclick = () => showSummary(i);
+                listCont.appendChild(btn);
+            });
+            if((eObj.units || []).length === 0) listCont.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">尚無單元資料 🥺</p>';
+
+            const paperCont = document.getElementById('exam-papers-container');
+            paperCont.innerHTML = '';
+            (eObj.examPapers || []).forEach((p, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-4 text-left font-bold bg-purple-50 rounded-xl shadow-sm hover:bg-purple-100 border border-purple-100 transition-colors text-purple-800 flex flex-col gap-1.5";
+                btn.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="bg-purple-200 text-purple-800 text-[10px] px-2 py-0.5 rounded">${p.year} 學年度</span>
+                        <span class="bg-indigo-100 text-indigo-700 text-[10px] px-2 py-0.5 rounded">${p.publisher}</span>
+                    </div>
+                    <div class="text-[15px]"><i class="fa-solid fa-file-signature mr-1 text-purple-400"></i> ${p.school}</div>
+                    <div class="text-xs text-gray-500 font-medium ml-5">共 ${p.questions.length} 題挑戰</div>
+                `;
+                btn.onclick = () => startExamPaper(idx);
+                paperCont.appendChild(btn);
+            });
+            if((eObj.examPapers || []).length === 0) paperCont.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">尚無考古題資料 🥺</p>';
+            
+            document.getElementById('review-count').innerText = (eObj.wrongs ? eObj.wrongs.length : 0) + " 題";
+            document.getElementById('exam-review-count').innerText = (eObj.examWrongs ? eObj.examWrongs.length : 0) + " 題";
+            
+            showPage('page-home');
+        }
+
+        function goHomeFirstPage() {
+            if(!document.getElementById('page-test').classList.contains('hidden')) {
+                if(!confirm('確定要結束目前的測驗並回到首頁嗎？')) return;
+            }
+            updateStarUI();
+            renderAppImg();
+            showPage('page-grades');
+        }
+
+        function showSummary(i) {
+            curUnitIdx = i;
+            const u = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam].units[i];
+            document.getElementById('unit-summary-img-container').innerHTML = db.settings?.imgEnabled ? createImgTag(u.unitImg) : '';
+            document.getElementById('summary-title').innerText = "💡 " + u.name;
+            document.getElementById('summary-text').innerHTML = (u.summary || "").replace(/\[(.*?)\]/g, '<span class="highlight">$1</span>');
+            showPage('page-summary');
+        }
+
+        function startTestFlow(mode) {
+            const eObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
+            if(mode === 'normal') {
+                const u = eObj.units[curUnitIdx];
+                testList = JSON.parse(JSON.stringify(u.questions || []));
+                testList.sort(() => Math.random() - 0.5);
+                currentRunningMode = 'normal';
+                
+                document.getElementById('test-paper-header-tag').classList.add('hidden');
+                document.getElementById('test-mode-badge').innerText = '單元自我診斷';
+                document.getElementById('test-mode-badge').className = 'px-3 py-1 rounded-full font-bold text-xs bg-pink-100 text-pink-600';
+            }
+            curIdx = 0;
+            score = 0;
+            if(testList.length === 0) return alert('此單元目前沒有測驗題唷！');
+            showPage('page-test');
+            renderQ();
+        }
+
+        function startExamPaper(idx) {
+            const eObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
+            const p = eObj.examPapers[idx];
+            testList = JSON.parse(JSON.stringify(p.questions));
+            testList.sort(() => Math.random() - 0.5);
+            currentRunningMode = 'exam';
+            curIdx = 0;
+            score = 0;
+            
+            const tag = document.getElementById('test-paper-header-tag');
+            tag.innerText = `🎯 ${p.year}學年度 | ${p.publisher} | ${p.school}`;
+            tag.classList.remove('hidden');
+            document.getElementById('test-mode-badge').innerText = '考古題實戰';
+            document.getElementById('test-mode-badge').className = 'px-3 py-1 rounded-full font-bold text-xs bg-purple-100 text-purple-700';
+
+            if(testList.length === 0) return alert('此份考卷暫無題目！');
+            showPage('page-test');
+            renderQ();
+        }
+
+        function startReview(mode) {
+            const eObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
+            let targetList = mode === 'normal' ? eObj.wrongs : eObj.examWrongs;
+            
+            if (!targetList || targetList.length === 0) return alert('太棒了！目前沒有錯題紀錄唷！✨');
+            
+            testList = JSON.parse(JSON.stringify(targetList));
+            testList.sort(() => Math.random() - 0.5);
+            currentRunningMode = mode === 'normal' ? 'review_normal' : 'review_exam';
+            curIdx = 0;
+            score = 0;
+            
+            document.getElementById('test-paper-header-tag').classList.add('hidden');
+            document.getElementById('test-mode-badge').innerText = mode === 'normal' ? '單元錯題複習' : '考古題錯題複習';
+            document.getElementById('test-mode-badge').className = 'px-3 py-1 rounded-full font-bold text-xs bg-amber-100 text-amber-600';
+            
+            showPage('page-test');
+            renderQ();
+        }
+
+        function renderQ() {
+            document.getElementById('feedback').classList.add('hidden');
+            const qObj = testList[curIdx];
+            document.getElementById('q-text').innerText = `${curIdx + 1}. ${qObj.q}`;
+            document.getElementById('test-progress').innerText = `${curIdx + 1} / ${testList.length}`;
+            
+            const opts = document.getElementById('options');
+            opts.innerHTML = '';
+            
+            qObj.a.forEach((optStr, i) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border border-gray-200 font-bold bg-white hover:bg-pink-50 transition-colors shadow-sm text-gray-700";
+                btn.innerText = optStr;
+                btn.onclick = () => checkAns(i, qObj.correct, qObj);
+                opts.appendChild(btn);
+            });
+        }
+
+        function checkAns(selIdx, correctIdx, qObj) {
+            const opts = document.getElementById('options').children;
+            for (let btn of opts) { btn.disabled = true; btn.classList.add('opacity-70'); }
+            
+            opts[correctIdx].classList.replace('bg-white', 'bg-green-100');
+            opts[correctIdx].classList.replace('border-gray-200', 'border-green-400');
+            
+            const fb = document.getElementById('feedback');
+            const fbText = document.getElementById('feedback-text');
+            
+            if (selIdx === correctIdx) {
+                score++;
+                fb.classList.replace('bg-pink-50', 'bg-green-50');
+                fb.classList.replace('border-pink-100', 'border-green-200');
+                fbText.innerHTML = `✅ 答對了！<br><span class="text-green-700 mt-2 block">${qObj.msg || ''}</span>`;
+            } else {
+                opts[selIdx].classList.replace('bg-white', 'bg-red-100');
+                opts[selIdx].classList.replace('border-gray-200', 'border-red-400');
+                fb.classList.replace('bg-green-50', 'bg-pink-50');
+                fb.classList.replace('border-green-200', 'border-pink-100');
+                fbText.innerHTML = `❌ 答錯囉！<br><span class="text-pink-600 mt-2 block">${qObj.msg || ''}</span>`;
+                saveWrong(qObj);
+            }
+            fb.classList.remove('hidden');
+        }
+
+        function saveWrong(qObj) {
+            const eObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
+            if (currentRunningMode === 'normal' || currentRunningMode === 'review_normal') {
+                if (!eObj.wrongs.some(w => w.q === qObj.q)) eObj.wrongs.push(qObj);
+            } else {
+                if (!eObj.examWrongs.some(w => w.q === qObj.q)) eObj.examWrongs.push(qObj);
+            }
+        }
+
+        function nextQ() {
+            curIdx++;
+            if (curIdx >= testList.length) endTest();
+            else renderQ();
+        }
+
+        function endTest() {
+            let accuracy = Math.round((score / testList.length) * 100) || 0;
+            document.getElementById('score-circle').innerText = accuracy;
+            document.getElementById('score-msg').innerText = accuracy >= 80 ? "太棒了！你做得非常好！🐰✨" : "沒關係，我們再複習一次一定會更好！加油！💪";
+            
+            if(accuracy >= 80 && !currentRunningMode.includes('review')) {
+                db.stars += 1;
+                updateStarUI();
+                document.getElementById('star-gain-alert').classList.remove('hidden');
+            } else {
+                document.getElementById('star-gain-alert').classList.add('hidden');
+            }
+
+            if(accuracy === 100) {
+                confetti({particleCount: 150, spread: 70});
+                document.getElementById('perfect-badge').classList.remove('hidden');
+            } else {
+                document.getElementById('perfect-badge').classList.add('hidden');
+            }
+
+            document.getElementById('page-test').classList.add('hidden');
+            document.getElementById('result-overlay').classList.remove('hidden');
+        }
+
+        function closeResult() {
+            document.getElementById('result-overlay').classList.add('hidden');
+            showHome(); 
+        }
+
+        function checkPassword() {
+            if(prompt("請輸入教練密碼：") === ADMIN_PASS) {
+                document.getElementById('admin-stars-count').value = db.stars;
+                document.getElementById('page-admin').classList.remove('hidden');
+            } else alert('密碼錯誤！');
+        }
+        function toggleAdmin() { document.getElementById('page-admin').classList.add('hidden'); }
+
+        function buildAdminGradeButtons() {
+            const cont = document.getElementById('admin-grade-select');
+            cont.innerHTML = '';
+            gradeList.forEach(g => {
+                const b = document.createElement('button');
+                b.className = "border border-gray-200 p-2 rounded-lg text-xs bg-gray-50 hover:bg-gray-100 font-bold text-gray-600";
+                b.innerText = g;
+                b.onclick = () => adminSetGrade(g, b);
+                cont.appendChild(b);
+            });
+        }
+
+        function buildAdminSubButtons() {
+            const cont = document.getElementById('admin-sub-select');
+            cont.innerHTML = '';
+            subjectList.forEach(s => {
+                const b = document.createElement('button');
+                b.className = "border border-gray-200 p-2 rounded-lg text-xs bg-gray-50 hover:bg-gray-100 font-bold text-gray-600";
+                b.innerText = s;
+                b.onclick = () => adminSetSub(s, b);
+                cont.appendChild(b);
+            });
+        }
+
+        function adminSetGrade(g, btn) {
+            adGrade = g; adSub=''; adSem=''; adExam='';
+            document.querySelectorAll('#admin-grade-select button').forEach(x=>x.classList.remove('admin-select-active'));
+            btn.classList.add('admin-select-active');
+            updateAdminUI();
+        }
+        function adminSetSub(s, btn) {
+            adSub = s; adSem=''; adExam='';
+            document.querySelectorAll('#admin-sub-select button').forEach(x=>x.classList.remove('admin-select-active'));
+            btn.classList.add('admin-select-active');
+            updateAdminUI();
+        }
+        function adminSetSem(sem) {
+            adSem = sem; adExam='';
+            document.querySelectorAll('#admin-sem-select button').forEach(x=>x.classList.remove('admin-select-active'));
+            document.getElementById('ad-sem-'+sem).classList.add('admin-select-active');
+            updateAdminUI();
+        }
+        function adminSetExam(ex) {
+            if(!adGrade || !adSub || !adSem) return alert('請先選擇前面所有的階層');
+            adExam = ex;
+            document.querySelectorAll('#admin-exam-select button').forEach(x=>x.classList.remove('admin-select-active'));
+            document.getElementById('ad-exam-'+ex).classList.add('admin-select-active');
+            
+            document.getElementById('admin-main-area').classList.remove('hidden');
+            document.getElementById('admin-reset-scope-text').innerText = `${adGrade}年級 ${adSub} ${adSem} ${adExam}`;
+            
+            document.getElementById('admin-label-grade-img').innerText = `[${adGrade}年級] 首頁圖片：`;
+            document.getElementById('admin-input-grade-img').value = db.grades[adGrade].mainImg || '';
+            document.getElementById('admin-label-sub-img').innerText = `[${adSub}] 科目首頁圖片：`;
+            document.getElementById('admin-input-sub-img').value = db.grades[adGrade].subjects[adSub].mainImg || '';
+            document.getElementById('admin-label-sem-img').innerText = `[${adSem}] 選擇學期圖片：`;
+            document.getElementById('admin-input-sem-img').value = db.grades[adGrade].subjects[adSub].semesters[adSem].mainImg || '';
+            document.getElementById('admin-label-exam-img').innerText = `[${adExam}] 單元列表背景圖片：`;
+            document.getElementById('admin-input-exam-img').value = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg || '';
+            
+            updateWrongCounts();
+            renderAdminUnitList();
+            renderAdminExamPapers();
+            document.getElementById('edit-area').classList.add('hidden');
+        }
+
+        function updateAdminUI() {
+            document.getElementById('admin-main-area').classList.add('hidden');
+        }
+
+        function updateWrongCounts() {
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            document.getElementById('admin-cnt-normal-wrong').innerText = eObj.wrongs ? eObj.wrongs.length : 0;
+            document.getElementById('admin-cnt-exam-wrong').innerText = eObj.examWrongs ? eObj.examWrongs.length : 0;
+        }
+
+        function resetSelectedScopeWrongs(mode) {
+            if(!confirm('🚨 確定要清空錯題本嗎？此操作無法還原！')) return;
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            if(mode === 'normal' || mode === 'all') eObj.wrongs = [];
+            if(mode === 'exam' || mode === 'all') eObj.examWrongs = [];
+            updateWrongCounts();
+            alert('✅ 錯題本已清空！請記得點擊最下方的「儲存並同步至雲端」。');
+        }
+
+        function renderAdminUnitList() {
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            const list = document.getElementById('admin-unit-list');
+            list.innerHTML = '';
+            (eObj.units || []).forEach((u, i) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-pink-50 rounded-xl border border-pink-100 text-sm font-bold text-gray-700";
+                div.innerHTML = `
+                    <span>📖 ${u.name}</span>
+                    <div class="gap-2 flex">
+                        <button onclick="editUnit(${i})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="delUnit(${i})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+                list.appendChild(div);
+            });
+        }
+
+        function addUnitRow() {
+            const name = prompt("請輸入新單元名稱：");
+            if(name) {
+                const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+                eObj.units.push({ name: name, unitImg: '', summary: '', questions: [] });
+                renderAdminUnitList();
+            }
+        }
+
+        function delUnit(i) {
+            if(!confirm('確定刪除此單元？')) return;
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            eObj.units.splice(i, 1);
+            renderAdminUnitList();
+            document.getElementById('edit-area').classList.add('hidden');
+        }
+
+        function editUnit(i) {
+            curUnitIdx = i;
+            const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[i];
+            document.getElementById('editing-unit-name').innerText = u.name;
+            document.getElementById('admin-unit-img-url').value = u.unitImg || '';
+            document.getElementById('admin-summary').value = u.summary || '';
+            document.getElementById('admin-questions').value = u.questions ? JSON.stringify(u.questions, null, 2) : '';
+            document.getElementById('edit-area').classList.remove('hidden');
+        }
+
+        function applyUnitEdit() {
+            try {
+                const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[curUnitIdx];
+                u.unitImg = document.getElementById('admin-unit-img-url').value;
+                u.summary = document.getElementById('admin-summary').value;
+                const qStr = document.getElementById('admin-questions').value.trim();
+                u.questions = qStr ? JSON.parse(qStr.replace(/'/g, '"')) : [];
+                alert('單元資料暫存成功！');
+            } catch(e) { alert('JSON 格式錯誤，請檢查測驗題部分！'); }
+        }
+
+        function renderAdminExamPapers() {
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            const container = document.getElementById('admin-papers-list-container');
+            container.innerHTML = '';
+            (eObj.examPapers || []).forEach((p, idx) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-white rounded-lg border border-purple-100 text-xs text-gray-700 shadow-sm";
+                div.innerHTML = `
+                    <div><span class="font-bold text-purple-700">${p.year}學年度</span> | ${p.publisher} | ${p.school} (${p.questions.length}題)</div>
+                    <button onclick="removeAdminExamPaper(${idx})" class="text-red-500 font-bold hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function savePaperDraftToExam() {
+            const pub = document.getElementById('input-paper-publisher').value.trim();
+            const year = document.getElementById('input-paper-year').value.trim();
+            const school = document.getElementById('input-paper-school').value.trim();
+            const jsonStr = document.getElementById('input-paper-json').value.trim();
+
+            if(!pub || !year || !school || !jsonStr) return alert('請填寫完整資訊（包含學年度）與題目 JSON！');
+            try {
+                const qArr = JSON.parse(jsonStr.replace(/'/g, '"'));
+                if(!Array.isArray(qArr)) throw new Error("必須是陣列格式");
+                
+                const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+                eObj.examPapers.push({
+                    publisher: pub,
+                    year: year,
+                    school: school,
+                    questions: qArr
+                });
+                
+                document.getElementById('input-paper-publisher').value = '';
+                document.getElementById('input-paper-year').value = '';
+                document.getElementById('input-paper-school').value = '';
+                document.getElementById('input-paper-json').value = '';
+                
+                renderAdminExamPapers();
+                alert('已新增該份考古題至清單中！');
+            } catch(e) {
+                alert('JSON 格式錯誤，請檢查！\n' + e.message);
+            }
+        }
+
+        function removeAdminExamPaper(idx) {
+            if(!confirm('確定要刪除這份試卷嗎？')) return;
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            eObj.examPapers.splice(idx, 1);
+            renderAdminExamPapers();
+        }
+
+        async function saveToCloud() {
+            const btn = document.getElementById('final-save-btn');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> 正在儲存...';
+            btn.disabled = true;
+
+            db.stars = parseInt(document.getElementById('admin-stars-count').value) || db.stars;
+            db.appMainImg = document.getElementById('admin-app-img-url').value;
+            
+            if(adGrade && adSub && adSem && adExam) {
+                db.grades[adGrade].mainImg = document.getElementById('admin-input-grade-img').value;
+                db.grades[adGrade].subjects[adSub].mainImg = document.getElementById('admin-input-sub-img').value;
+                db.grades[adGrade].subjects[adSub].semesters[adSem].mainImg = document.getElementById('admin-input-sem-img').value;
+                db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg = document.getElementById('admin-input-exam-img').value;
+            }
+
+            try {
+                await fetch(API_URL, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                    body: JSON.stringify(db)
+                });
+                alert("太棒了！所有資料已成功儲存至雲端！🚀");
+                location.reload();
+            } catch (e) {
+                alert("儲存失敗！");
+                btn.innerHTML = '💾 儲存所有變更並同步至雲端';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
