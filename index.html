@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ 수제비 선생님 지선이 공부방 V27.2 (기출문제)</title>
+    <title>✨ 수제비 선생님 지선이 공부방 V27.3 (기출 완치판)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -181,7 +181,7 @@
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-[300] p-4 md:p-6 overflow-y-auto">
             <div class="max-w-2xl mx-auto">
                 <div class="flex justify-between items-center border-b pb-4 mb-6">
-                    <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V27.2 기출 동기화 버그 수정판)</h2>
+                    <h2 class="text-xl font-bold text-gray-800">🐰 智慧後台 (V27.3 자동 동기화 버그 수정판)</h2>
                     <button onclick="toggleAdmin()" class="text-3xl text-gray-400 hover:text-pink-500">&times;</button>
                 </div>
                 
@@ -353,8 +353,7 @@
             }, 4000);
 
             try {
-                // 🚨 [V27.2 핵심 수정] 항상 신선한 데이터를 가져오도록 cache: 'no-store' 명시적 추가
-                const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY }, cache: 'no-store' });
+                const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY } });
                 if (!res.ok) throw new Error("Network response was not ok");
                 const data = await res.json();
                 db = data.record || db;
@@ -660,6 +659,10 @@
             fb.classList.remove('hidden');
         }
 
+        function findParsedJSON(str) {
+            try { return JSON.parse(str); } catch(e) { return JSON.parse(str.replace(/'/g, '"')); }
+        }
+
         function saveWrong(qObj) {
             const eObj = db.grades[curGrade].subjects[curSub].semesters[curSem].exams[curExam];
             if (currentRunningMode === 'normal' || currentRunningMode === 'review_normal') {
@@ -847,7 +850,7 @@
                 u.unitImg = document.getElementById('admin-unit-img-url').value;
                 u.summary = document.getElementById('admin-summary').value;
                 const qStr = document.getElementById('admin-questions').value.trim();
-                u.questions = qStr ? JSON.parse(qStr.replace(/'/g, '"')) : [];
+                u.questions = qStr ? findParsedJSON(qStr) : [];
                 alert('單元資料暫存成功！');
             } catch(e) { alert('JSON 格式錯誤，請檢查測驗題部分！'); }
         }
@@ -875,7 +878,7 @@
 
             if(!pub || !year || !school || !jsonStr) return alert('請填寫完整資訊（包含學年度）與題目 JSON！');
             try {
-                const qArr = JSON.parse(jsonStr.replace(/'/g, '"'));
+                const qArr = findParsedJSON(jsonStr);
                 if(!Array.isArray(qArr)) throw new Error("必須是陣列格式");
                 
                 const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
@@ -905,6 +908,7 @@
             renderAdminExamPapers();
         }
 
+        // 🚨 [V27.3 최종 수정] 사용자가 중간 분홍색 버튼을 생략하더라도, 현재 활성화되어 입력 중인 단원 내용 및 기출문제를 자동으로 DB 객체에 동기화 후 전송
         async function saveToCloud() {
             const btn = document.getElementById('final-save-btn');
             btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> 正在儲存...';
@@ -914,12 +918,53 @@
             db.appMainImg = document.getElementById('admin-app-img-url').value;
             
             if(adGrade && adSub && adSem && adExam) {
+                // 1. 이미지 동기화
                 db.grades[adGrade].mainImg = document.getElementById('admin-input-grade-img').value;
                 db.grades[adGrade].subjects[adSub].mainImg = document.getElementById('admin-input-sub-img').value;
                 db.grades[adGrade].subjects[adSub].semesters[adSem].mainImg = document.getElementById('admin-input-sem-img').value;
                 db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg = document.getElementById('admin-input-exam-img').value;
                 
-                console.log("Saving examPapers & units to cloud context for:", adGrade, adSub, adSem, adExam);
+                // 2. [V27.3 핵심 보완] 만약 단원 편집창이 켜져있다면, 입력된 텍스트를 검은 버튼 누를 때 자동 임시저장 처리
+                const editArea = document.getElementById('edit-area');
+                if (editArea && !editArea.classList.contains('hidden') && curUnitIdx !== -1) {
+                    try {
+                        const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[curUnitIdx];
+                        u.unitImg = document.getElementById('admin-unit-img-url').value;
+                        u.summary = document.getElementById('admin-summary').value;
+                        const qStr = document.getElementById('admin-questions').value.trim();
+                        u.questions = qStr ? findParsedJSON(qStr) : [];
+                    } catch(e) {
+                        alert('⚠️ [저장 실패] 현재 편집 중인 단원의 문제 JSON 형식이 올바르지 않습니다. 따옴표나 괄호를 확인해주세요.');
+                        btn.innerHTML = '💾 儲存所有變更並同步至雲端';
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+
+                // 3. [V27.3 핵심 보완] 만약 하단 기출문제 추가란에 데이터가 남아있다면 자동 검증 후 임시 리스트에 병합
+                const pub = document.getElementById('input-paper-publisher').value.trim();
+                const year = document.getElementById('input-paper-year').value.trim();
+                const school = document.getElementById('input-paper-school').value.trim();
+                const jsonStr = document.getElementById('input-paper-json').value.trim();
+                if (pub || year || school || jsonStr) {
+                    if (pub && year && school && jsonStr) {
+                        try {
+                            const qArr = findParsedJSON(jsonStr);
+                            if (Array.isArray(qArr)) {
+                                const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+                                if (!eObj.examPapers.some(p => p.school === school && p.year === year)) {
+                                    eObj.examPapers.push({ publisher: pub, year: year, school: school, questions: qArr });
+                                }
+                            }
+                        } catch(e) {
+                            alert('⚠️ [저장 실패] 아래 기출문제 입력란에 작성 중인 JSON 형식이 올바르지 않습니다.');
+                            btn.innerHTML = '💾 儲存所有變更並同步至雲端';
+                            btn.disabled = false;
+                            return;
+                        }
+                    }
+                }
+                console.log("Successfully synced examPapers & units to local memory context.");
             }
 
             try {
@@ -928,7 +973,7 @@
                     headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
                     body: JSON.stringify(db)
                 });
-                alert("太棒了！所有資料已成功儲存至雲端！🚀");
+                alert("太棒了！所有資料已成功儲存至雲端！🚀\n(모든 데이터가 완벽하게 클라우드에 연동되었습니다!)");
                 location.reload();
             } catch (e) {
                 alert("儲存失敗！請檢查網路連線。");
