@@ -31,7 +31,6 @@
 </head>
 <body onload="loadFromCloud()">
     
-    <!-- 同步中遮罩 -->
     <div id="loading-overlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-4">
         <div class="animate-spin text-4xl text-pink-500 mb-4"><i class="fa-solid fa-circle-notch"></i></div>
         <p class="text-pink-500 font-bold">同步中 / 데이터 동기화 중...</p>
@@ -41,7 +40,6 @@
         </button>
     </div>
 
-    <!-- 導覽列 -->
     <nav class="p-4 flex justify-between items-center max-w-4xl mx-auto">
         <h1 class="text-xl font-bold text-pink-500 flex items-center gap-2" onclick="goHomeFirstPage()" style="cursor:pointer">
             ✨ 수제비 선생님!
@@ -58,7 +56,6 @@
         </div>
     </nav>
 
-    <!-- 測驗結果彈窗 -->
     <div id="result-overlay" class="result-card hidden">
         <h2 class="text-3xl font-bold text-pink-600 mb-2">測試結束！</h2>
         <div class="relative my-4">
@@ -77,14 +74,12 @@
     </div>
 
     <main class="max-w-4xl mx-auto px-4 md:px-6 pb-20">
-        <!-- 年級選擇 -->
         <section id="page-grades" class="max-w-md mx-auto">
             <div id="app-img-container" class="mb-4"></div>
             <div class="soobin-bubble">"今天也要跟我一起加油學習喔！🌱<br>目前我們已經累積了 <span id="welcome-stars" class="text-amber-500 font-black">0</span> 顆奮鬥之星囉！<br>今天想先看哪個年級呢？"</div>
             <div class="grid grid-cols-2 gap-4" id="grade-buttons-container"></div>
         </section>
 
-        <!-- 科目選擇 -->
         <section id="page-subjects" class="hidden max-w-md mx-auto">
             <div id="grade-img-container" class="mb-4"></div>
             <button onclick="showPage('page-grades')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回年級選擇</button>
@@ -92,7 +87,6 @@
             <div class="grid grid-cols-2 gap-4" id="subject-buttons-container"></div>
         </section>
 
-        <!-- 學期選擇 -->
         <section id="page-semesters" class="hidden max-w-md mx-auto">
             <div id="subject-img-container" class="mb-4"></div>
             <button onclick="showPage('page-subjects')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回科目選擇</button>
@@ -103,7 +97,6 @@
             </div>
         </section>
 
-        <!-- 段考選擇 -->
         <section id="page-exams" class="hidden max-w-md mx-auto">
             <div id="semester-img-container" class="mb-4"></div>
             <button onclick="showPage('page-semesters')" class="text-sm text-pink-400 underline font-bold mb-4 inline-block">⬅️ 返回學期選擇</button>
@@ -115,7 +108,6 @@
             </div>
         </section>
 
-        <!-- 單元與考古題大本營 -->
         <section id="page-home" class="hidden">
             <div class="text-center max-w-md mx-auto">
                 <div id="sub-img-container" class="mb-4"></div>
@@ -124,7 +116,6 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                <!-- 左側：單元管理 -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-pink-100 flex flex-col">
                     <div class="border-b-2 border-pink-50 pb-3 mb-5">
                         <h3 class="text-xl font-bold text-pink-600 flex items-center gap-2">
@@ -135,7 +126,6 @@
                     <div id="unit-list-container" class="space-y-3 flex-1"></div>
                 </div>
 
-                <!-- 右側：歷屆考古題 -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border-2 border-purple-100 flex flex-col">
                     <div class="border-b-2 border-purple-50 pb-3 mb-5">
                         <h3 class="text-xl font-bold text-purple-600 flex items-center gap-2">
@@ -159,7 +149,6 @@
             </div>
         </section>
 
-        <!-- 第一階段：觀念要點 -->
         <section id="page-summary" class="hidden space-y-4 max-w-md mx-auto">
             <div id="unit-summary-img-container" class="mb-4"></div>
             <div class="glass p-6 border-2 border-pink-100">
@@ -171,7 +160,6 @@
             <button onclick="showPage('page-home')" class="w-full text-center text-gray-400 text-sm underline mt-2">返回單元列表</button>
         </section>
 
-        <!-- 核心測驗引擎 -->
         <section id="page-test" class="hidden max-w-md mx-auto">
             <div id="unit-test-img-container" class="mb-4"></div>
             <div class="mb-4 text-xs flex justify-between items-center bg-white p-3 rounded-full shadow-sm border border-gray-100">
@@ -190,7 +178,6 @@
             </div>
         </section>
 
-        <!-- 后台管理 -->
         <section id="page-admin" class="hidden fixed inset-0 bg-white z-[300] p-4 md:p-6 overflow-y-auto">
             <div class="max-w-2xl mx-auto">
                 <div class="flex justify-between items-center border-b pb-4 mb-6">
@@ -366,7 +353,8 @@
             }, 4000);
 
             try {
-                const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY } });
+                // 🚨 [V27.2 핵심 수정] 항상 신선한 데이터를 가져오도록 cache: 'no-store' 명시적 추가
+                const res = await fetch(API_URL, { headers: { "X-Master-Key": MASTER_KEY }, cache: 'no-store' });
                 if (!res.ok) throw new Error("Network response was not ok");
                 const data = await res.json();
                 db = data.record || db;
@@ -917,7 +905,6 @@
             renderAdminExamPapers();
         }
 
-        // 🚨 [V27.2 핵심 수정] 이미지뿐만 아니라 현재 선택된 범위의 units(단원)과 examPapers(기출문제)를 통째로 갱신하여 클라우드로 전송하도록 수정
         async function saveToCloud() {
             const btn = document.getElementById('final-save-btn');
             btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> 正在儲存...';
@@ -927,14 +914,11 @@
             db.appMainImg = document.getElementById('admin-app-img-url').value;
             
             if(adGrade && adSub && adSem && adExam) {
-                // 1. 이미지 동기화
                 db.grades[adGrade].mainImg = document.getElementById('admin-input-grade-img').value;
                 db.grades[adGrade].subjects[adSub].mainImg = document.getElementById('admin-input-sub-img').value;
                 db.grades[adGrade].subjects[adSub].semesters[adSem].mainImg = document.getElementById('admin-input-sem-img').value;
                 db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg = document.getElementById('admin-input-exam-img').value;
                 
-                // 2. 중요: 백오피스 리스트에 추가되어 있는 units와 examPapers 데이터의 최신 상태를 강제로 동기화
-                // (메모리에 보관된 임시 상태가 유실되지 않도록 보장)
                 console.log("Saving examPapers & units to cloud context for:", adGrade, adSub, adSem, adExam);
             }
 
