@@ -774,4 +774,214 @@
             
             document.getElementById('admin-label-grade-img').innerText = `[${adGrade}年級] 首頁圖片：`;
             document.getElementById('admin-input-grade-img').value = db.grades[adGrade].mainImg || '';
-            document.getElementById('admin-label-sub-img').innerText = `[${ad
+            document.getElementById('admin-label-sub-img').innerText = `[${adSub}] 科目首頁圖片：`;
+            document.getElementById('admin-input-sub-img').value = db.grades[adGrade].subjects[adSub].mainImg || '';
+            document.getElementById('admin-label-sem-img').innerText = `[${adSem}] 選擇學期圖片：`;
+            document.getElementById('admin-input-sem-img').value = db.grades[adGrade].subjects[adSub].semesters[adSem].mainImg || '';
+            document.getElementById('admin-label-exam-img').innerText = `[${adExam}] 單元列表背景圖片：`;
+            document.getElementById('admin-input-exam-img').value = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg || '';
+            
+            updateWrongCounts();
+            renderAdminUnitList();
+            renderAdminExamPapers();
+            document.getElementById('edit-area').classList.add('hidden');
+        }
+
+        function updateAdminUI() {
+            document.getElementById('admin-main-area').classList.add('hidden');
+        }
+
+        function updateWrongCounts() {
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            document.getElementById('admin-cnt-normal-wrong').innerText = eObj.wrongs ? eObj.wrongs.length : 0;
+            document.getElementById('admin-cnt-exam-wrong').innerText = eObj.examWrongs ? eObj.examWrongs.length : 0;
+        }
+
+        function resetSelectedScopeWrongs(mode) {
+            if(!confirm('🚨 確定要清空錯題本嗎？此操作無法還原！')) return;
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            if(mode === 'normal' || mode === 'all') eObj.wrongs = [];
+            if(mode === 'exam' || mode === 'all') eObj.examWrongs = [];
+            updateWrongCounts();
+            alert('✅ 錯題本已清空！請記得點擊最下方的「儲存並同步至雲端」。');
+        }
+
+        function renderAdminUnitList() {
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            const list = document.getElementById('admin-unit-list');
+            list.innerHTML = '';
+            (eObj.units || []).forEach((u, i) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-pink-50 rounded-xl border border-pink-100 text-sm font-bold text-gray-700";
+                div.innerHTML = `
+                    <span>📖 ${u.name}</span>
+                    <div class="gap-2 flex">
+                        <button onclick="editUnit(${i})" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="delUnit(${i})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+                list.appendChild(div);
+            });
+        }
+
+        function addUnitRow() {
+            const name = prompt("請輸入新單元名稱：");
+            if(name) {
+                const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+                eObj.units.push({ name: name, unitImg: '', summary: '', questions: [] });
+                renderAdminUnitList();
+            }
+        }
+
+        function delUnit(i) {
+            if(!confirm('確定刪除此單元？')) return;
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            eObj.units.splice(i, 1);
+            renderAdminUnitList();
+            document.getElementById('edit-area').classList.add('hidden');
+        }
+
+        function editUnit(i) {
+            curUnitIdx = i;
+            const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[i];
+            document.getElementById('editing-unit-name').innerText = u.name;
+            document.getElementById('admin-unit-img-url').value = u.unitImg || '';
+            document.getElementById('admin-summary').value = u.summary || '';
+            document.getElementById('admin-questions').value = u.questions ? JSON.stringify(u.questions, null, 2) : '';
+            document.getElementById('edit-area').classList.remove('hidden');
+        }
+
+        function applyUnitEdit() {
+            try {
+                const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[curUnitIdx];
+                u.unitImg = document.getElementById('admin-unit-img-url').value;
+                u.summary = document.getElementById('admin-summary').value;
+                const qStr = document.getElementById('admin-questions').value.trim();
+                u.questions = qStr ? findParsedJSON(qStr) : [];
+                alert('單元資料暫存成功！');
+            } catch(e) { alert('JSON 格式錯誤，請檢查測驗題部分！'); }
+        }
+
+        function renderAdminExamPapers() {
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            const container = document.getElementById('admin-papers-list-container');
+            container.innerHTML = '';
+            (eObj.examPapers || []).forEach((p, idx) => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-3 bg-white rounded-lg border border-purple-100 text-xs text-gray-700 shadow-sm";
+                div.innerHTML = `
+                    <div><span class="font-bold text-purple-700">${p.year}學年度</span> | ${p.publisher} | ${p.school} (${p.questions.length}題)</div>
+                    <button onclick="removeAdminExamPaper(${idx})" class="text-red-500 font-bold hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function savePaperDraftToExam() {
+            const pub = document.getElementById('input-paper-publisher').value.trim();
+            const year = document.getElementById('input-paper-year').value.trim();
+            const school = document.getElementById('input-paper-school').value.trim();
+            const jsonStr = document.getElementById('input-paper-json').value.trim();
+
+            if(!pub || !year || !school || !jsonStr) return alert('請填寫完整資訊（包含學年度）與題目 JSON！');
+            try {
+                const qArr = findParsedJSON(jsonStr);
+                if(!Array.isArray(qArr)) throw new Error("必須是陣列格式");
+                
+                const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+                eObj.examPapers.push({
+                    publisher: pub,
+                    year: year,
+                    school: school,
+                    questions: qArr
+                });
+                
+                document.getElementById('input-paper-publisher').value = '';
+                document.getElementById('input-paper-year').value = '';
+                document.getElementById('input-paper-school').value = '';
+                document.getElementById('input-paper-json').value = '';
+                
+                renderAdminExamPapers();
+                alert('已新增該份考古題至臨時清單中！請記得拉到最下方點擊「儲存並同步至雲端」。');
+            } catch(e) {
+                alert('JSON 格式錯誤，請檢查！\n' + e.message);
+            }
+        }
+
+        function removeAdminExamPaper(idx) {
+            if(!confirm('確定要刪除這份試卷嗎？')) return;
+            const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+            eObj.examPapers.splice(idx, 1);
+            renderAdminExamPapers();
+        }
+
+        async function saveToCloud() {
+            const btn = document.getElementById('final-save-btn');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin"></i> 正在儲存...';
+            btn.disabled = true;
+
+            db.stars = parseInt(document.getElementById('admin-stars-count').value) || db.stars;
+            db.appMainImg = document.getElementById('admin-app-img-url').value;
+            
+            if(adGrade && adSub && adSem && adExam) {
+                db.grades[adGrade].mainImg = document.getElementById('admin-input-grade-img').value;
+                db.grades[adGrade].subjects[adSub].mainImg = document.getElementById('admin-input-sub-img').value;
+                db.grades[adGrade].subjects[adSub].semesters[adSem].mainImg = document.getElementById('admin-input-sem-img').value;
+                db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].mainImg = document.getElementById('admin-input-exam-img').value;
+                
+                const editArea = document.getElementById('edit-area');
+                if (editArea && !editArea.classList.contains('hidden') && curUnitIdx !== -1) {
+                    try {
+                        const u = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam].units[curUnitIdx];
+                        u.unitImg = document.getElementById('admin-unit-img-url').value;
+                        u.summary = document.getElementById('admin-summary').value;
+                        const qStr = document.getElementById('admin-questions').value.trim();
+                        u.questions = qStr ? findParsedJSON(qStr) : [];
+                    } catch(e) {
+                        alert('⚠️ [저장 실패] 현재 편집 중인 단원의 문제 JSON 형식이 올바르지 않습니다. 따옴표나 괄호를 확인해주세요.');
+                        btn.innerHTML = '💾 儲存所有變更並同步至雲端';
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+
+                const pub = document.getElementById('input-paper-publisher').value.trim();
+                const year = document.getElementById('input-paper-year').value.trim();
+                const school = document.getElementById('input-paper-school').value.trim();
+                const jsonStr = document.getElementById('input-paper-json').value.trim();
+                if (pub || year || school || jsonStr) {
+                    if (pub && year && school && jsonStr) {
+                        try {
+                            const qArr = findParsedJSON(jsonStr);
+                            if (Array.isArray(qArr)) {
+                                const eObj = db.grades[adGrade].subjects[adSub].semesters[adSem].exams[adExam];
+                                if (!eObj.examPapers.some(p => p.school === school && p.year === year)) {
+                                    eObj.examPapers.push({ publisher: pub, year: year, school: school, questions: qArr });
+                                }
+                            }
+                        } catch(e) {
+                            alert('⚠️ [저장 실패] 아래 기출문제 입력란에 작성 중인 JSON 형식이 올바르지 않습니다.');
+                            btn.innerHTML = '💾 儲存所有變更並同步至雲端';
+                            btn.disabled = false;
+                            return;
+                        }
+                    }
+                }
+            }
+
+            try {
+                await fetch(API_URL, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+                    body: JSON.stringify(db)
+                });
+                alert("太棒了！所有資料已成功儲存至雲端！🚀\n(모든 데이터가 완벽하게 클라우드에 연동되었습니다!)");
+                location.reload();
+            } catch (e) {
+                alert("儲存失敗！請檢查網路連線。");
+                btn.innerHTML = '💾 儲存所有變更並同步至雲端';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
